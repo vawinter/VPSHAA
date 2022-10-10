@@ -2,7 +2,7 @@
 #----- Chapter 1: Propensity to mig.-----X
 #-------- Habitat Selection & RSFs  -----X
 ##------------- November 2021 -----------X
-##--- Last edited: February 10, 2022 ----X
+##--- Last edited: October 10, 2022 -----X
 #########################################X
 ##------- Last ran: May 24, 2022 --------X
 #########################################X
@@ -37,7 +37,8 @@ source("99_funs.R")
 
 ## Load data ---- # new edit 2/10/2022
 ### Load in landscape covariates ----
-dir <- "../Covar_org/"
+#dir <- "../Covar_org/"
+dir <- "https://usu.app.box.com/folder/148569758289?s=cjqu914q0cqvaop3k6v8uohc8cuuea31"
 
 # List covariate files
 landscapes <- list.files(dir, full.names = T)[!list.files(dir) %in% c("landscape_201801.tif",
@@ -89,7 +90,7 @@ for (l in landscapes) {
   
 
   # Load and str data ----
-  ph_dat <- readRDS("cleaned_data/comb_dat_20220524.rds")
+  ph_dat <- readRDS("Data/Processed/comb_dat_20220524.rds")
   
   # Filter desired date range
   ph <- ph_dat %>%
@@ -210,194 +211,3 @@ x <- readRDS("../RSF_data/202004_model_data.rds")
 head(x)
 
 # DONE!
-
-## OLD CODE ----
-dir <- "../Covar_org/"
-landscape <- stack(paste0(dir, "landscape_202011.tif"))
-
-# name the layers
-names(landscape) <- c("Elevation", "SND", "Asp_sin", "Asp_cos", "Roughness", "RAP_bio",
-                      "RAP_cover", "Shrub", "Tree")
-
-
-# name the layers (july)
-# names(landscape) <- c("Elevation", "Asp_sin", "Asp_cos", "Roughness", "RAP_bio",
-#                       "RAP_cover", "Shrub", "Tree")
-
-# plot
-plot(landscape)
-
-# Load and str data ----
-ph_dat <- readRDS("cleaned_data/20220531_ph_nov2020.rds")
-
-# Filter desired date range
-ph <- ph_dat %>%
-  dplyr::select(ID,
-         dt,
-         x,
-         y) %>%
-  filter(dt >= "2020-11-01" & dt <= "2020-11-30")  %>%
-  arrange(dt) # new edit 1/12
-
-# # 1. convert to utm
-# dat_sf <- st_as_sf(ph2,
-#                    coords = c("x", "y"),
-#                    crs = 4326) %>%
-#   st_transform(32612)
-# 
-# # Convert from sf back to ordinary data.frame
-# ph <- dat_sf %>%
-#   mutate(x = st_coordinates(geometry)[, 1],
-#          y = st_coordinates(geometry)[, 2]) %>%
-#   st_drop_geometry()
-
-# Extent ----
-# Let's write a function that will take our centroid coordinates and return an
-# extent that covers 25 sq. km.
-# Edit 1/12: 10 x 10 buffer (100 sq. km.)
-
-# x: x-coordinate
-# y: y-coordinate
-# half_side: number giving half the length of a side of the square of the
-# final exent. E.g., to get a 25 sq. km extent, each side of the square is
-# 5 km, so half a side is 2.5 km = 2500 m
-# 1/12: 10 km, half side is 5 km = 5000 m
-make_extent <- function(x, y, half_side = 5000) {
-  xmin <- x - half_side
-  xmax <- x + half_side
-  ymin <- y - half_side
-  ymax <- y + half_side
-  # Create 'extent' object
-  ext <- extent(xmin, xmax, ymin, ymax)
-   # Return
-  return(ext)
-}
-
-make_extent(ph$x[1], ph$y[1])
-
-# New edit: 1/12
-# testing to get the mid point for each indiv
-indiv <- unique(ph$ID)
-ph$mid_x <- NA
-ph$mid_y <- NA
-ph3 <- data.frame()
-
-for(i in 1:length(indiv)){
-  # Filter by individuals
-  dat <- filter(ph, ID == indiv[i]) %>%
-    # find target date around mid month for each
-    mutate(target_date = ymd_hms(paste0(year(dt), "11-15 12:00:00"))) %>%
-    # Denote how far dates are from mid month
-    mutate(dif = abs(difftime(dt, target_date)))
-  # save location point w/ least distance from mid month
-  dat$mid_x <- dat[which.min(dat$dif), ]$x
-  dat$mid_y <- dat[which.min(dat$dif), ]$y
-
-  # Combine in new df
-  ph3 <- rbind(dat, ph3)
-}
-
-# Looping over indiv rasters ----
-# 1. Create empty lists for storage
-clip <- list()
-locs <- list()
-indiv <- unique(ph3$ID)
-# New edit: 12/8 VW:
-locs_in <- list()
-
-# I want to create a raster of clipped covars available to each indiv
-#  within the extent to run RSF analysis
-
-# 2. Loop
-for(i in 1:length(indiv)){
-
-   # print status
-  print(paste(i, indiv[i]))
-
-  # Subset individual data
-  dat <- filter(ph3, ID == indiv[i])
-
-  # Turn into a track_xyt
-  locs[[i]] <- mk_track(dat, x, y, dt, crs = 32612)
-
-  # Now we can use the extent we created above to cut out a small piece of this
-  # raster
-  clip[[i]] <- crop(landscape, make_extent(dat$mid_x[1],dat$mid_y[1])) # Edit 1/12
-
-  # Extract values at used points in buffer
-  locs_in[[i]] <- locs[[i]] %>%
-    # BJS: use 'landscape' instead of 'clip[[i]]' for this
-     extract_covariates(landscape)
-
-  # Extract values for available points
-  avail <- as.data.frame(values(clip[[i]]))
-  avail$case_ <- FALSE
-
-  # Combine used and available
-  used <- locs_in[[i]] %>%
-    dplyr::select(-x_, -y_, -t_) %>%
-    mutate(case_ = TRUE)
-
-  # This is what you need for analysis
-  locs[[i]] <- rbind(used, avail)
-}
-
-# 3.  Combine all the location data for individuals
-names(locs) <- indiv
-
-mod_dat <- locs %>%
-  # bind rows of df
-  bind_rows(.id = "ID") %>%
-  # add weights column & input 1 for used and 5000 for available
-  mutate(w = as.character(ifelse(case_ == "TRUE", 1, 5000))) %>% 
-  mutate(month ="November",
-         year = "2020")
-
-# Save ----
-# BJS comment: I would end this script here. Save mod_dat as your "final"
-# model data, and fit RSFs in the next script
-saveRDS(mod_dat, "../RSF_data/202011_model_data_updated-ind.rds")
-#
-# # DONE!
-#
-#
-# # OLD CODE -----
-# # Finding location mid month :
-# # indiv <- unique(ph$ID)
-# # ph$mid_x <- NA
-# # ph$mid_y <- NA
-# #
-# # pt <- list()
-# #
-# # for(i in 1:length(indiv)){
-# #   dat <- filter(ph, ID == indiv[i]) %>%
-# #     mutate(target_date = ymd_hms(paste0(year(dt), "01-15 12:00:00"))) %>%
-# #     mutate(dif = abs(difftime(dt, target_date)))
-# #
-# #   mid_x <- dat[which.min(dat$dif), ]$x
-# #   mid_y <- dat[which.min(dat$dif), ]$y
-# #
-# #   # pt <- dat %>%
-# #   #   select(x, y, ID, mid_x, mid_y) %>%
-# #   #   mutate(mid_x == (nrow(dat$x)/2),
-# #   #          mid_y == (nrow(dat$y)/2))
-# # }
-#
-# # # 1. convert to utm
-# # dat_sf <- st_as_sf(ph2,
-# #                    coords = c("x", "y"),
-# #                    crs = 4326) %>%
-# #   st_transform(32612)
-# #
-# # # Convert from sf back to ordinary data.frame
-# # ph <- dat_sf %>%
-# #   mutate(x = st_coordinates(geometry)[, 1],
-# #          y = st_coordinates(geometry)[, 2]) %>%
-# #   st_drop_geometry()
-#
-# # # Add weights column
-# # mod_dat$w <- as.numeric(NA)
-# # # Input 1 for used and 5000 for available
-# # mod_dat$w <-  ifelse(mod_dat$case_ == "TRUE", 1, 5000)
-#
-# #mod_dat <- bind_rows(locs, .id = "ID")

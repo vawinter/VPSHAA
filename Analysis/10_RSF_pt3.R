@@ -3,7 +3,7 @@
 #-------- Habitat Selection & RSFs  -----X
 ##----------- January 2022  -------------X
 #########################################X
-##------ Last edited: 04/07/2022  -------X
+##------ Last edited: 10/10/2022  -------X
 #########################################X
 ##------- Last ran: May 25, 2022 --------X
 #########################################X
@@ -32,7 +32,9 @@ source("99_funs.R")
 
 # Load in data ----
 # directory
-dir <- "../RSF_data/"
+#dir <- "../RSF_data/"
+
+dir <- "https://usu.app.box.com/folder/150482148530"
 
 mod_dats <- list.files(dir, full.names = T)[!list.files(dir) %in% c("202102_model_data.rds",
                                                                    "202104_model_data.rds",

@@ -17,7 +17,8 @@ library(amt)
 library(dplyr)
 library(lubridate)
 
-remotes::install_github("jmsigner/amt", ref = "data-cleaning")
+# install cleaning fun
+devtools::install_github("jmsigner/amt", ref = "data-cleaning")
 
 # box_dir <- "C:/Users/veron/Box/Avgar Lab on WILD/"
 # # path to cleaning functions (can be found in this box folder)
@@ -142,11 +143,11 @@ id
 
 ## Save outputs ----
 # Save cleaned data
-saveRDS(clean, "Data/Processed/clean_ph_20220524.rds")
+saveRDS(clean, "Data/Processed/clean_ph_20221010.rds")
 # Save combined, filtered df's
-saveRDS(dat_clean, "Data/Processed/comb_dat_20220524.rds")
+saveRDS(dat_clean, "Data/Processed/comb_dat_20221010.rds")
 
 # DONE!
 
-x <- readRDS("Data/Processed/clean_ph_20220524.rds")
+x <- readRDS("Data/Processed/clean_ph_20221010.rds")
 
