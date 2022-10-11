@@ -19,3 +19,7 @@ create_github_token()
 # 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
 
 gitcreds::gitcreds_set()
+
+
+# setting URL if above does not work
+git remote set-url origin https://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@github.com/vermanica/eHSF.git
