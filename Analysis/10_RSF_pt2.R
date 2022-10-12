@@ -202,7 +202,7 @@ for (l in landscapes) {
   # BJS comment: I would end this script here. Save mod_dat as your "final"
   # model data, and fit RSFs in the next script
   ym <- stringr::word(stringr::word(l, 3, 3, "_"), 1, 1, "\\.")
-  saveRDS(mod_dat, paste0("../../Data/Chapter1/RSF/", ym, "_model_data.rds"))
+  saveRDS(mod_dat, paste0("Data/Processed/RSF_data/", ym, "_model_data.rds"))
     
 }
 

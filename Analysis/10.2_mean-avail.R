@@ -19,28 +19,17 @@ gc()
 
 # Load in packages
 library(dplyr)
-library(lubridate)
 
 # Load in data
-# mod_dats <- readRDS("../RSF_data/202011_model_data.rds")
-# Load in data ----
-# directory
-dir <- "../RSF_data/"
-
-mod_dats <- list.files(dir, full.names = T)[!list.files(dir) %in% c("202102_model_data.rds",
-                                                                    "202104_model_data.rds",
-                                                                    "202107_model_data.rds",
-                                                                    "202111_model_data.rds",
-                                                                    "20220629-mod_final_comb_IP.csv",
-                                                                    "old_data",
-                                                                    "final_outputs",
-                                                                    "20220620-mod_final_comb-IP.csv")]
-
-
-
-#mod <- readRDS("../RSF_data/202011_model_data_updated-ind.rds")
+mod <-readRDS("Data/Processed/RSF_data/20221011_3rd-order_RSF-prep.rds")
+mod$SND[is.na(mod$SND)] <- 0
+mod$SND <- as.numeric(mod$SND)
 
 # Formatting ----
+# iterate over unique individual/month/year combinations
+months <- unique(mod$month)
+years <- unique(mod$year)
+
 # Create empty data frame to store results
 output <- data.frame(ID = NA,
                      # Mean of covariates
@@ -53,31 +42,54 @@ output <- data.frame(ID = NA,
                      m_herb = NA,
                      m_shrub = NA,
                      m_tree = NA,
+                     # Mean scaled and centered
+                     m_SC_elev = NA,
+                   #  m__SC_snd = NA,
+                     m__SC_a.sin = NA,
+                     m__SC_a.cos = NA,
+                     m__SC_rough = NA,
+                     m__SC_bio = NA,
+                     m__SC_herb = NA,
+                     m__SC_shrub = NA,
+                     m__SC_tree = NA,
                      # month and year
                      month = NA,
                      year = NA)
 
 
 # Loop over
-for(m in mod_dats){
+# Loop over
+for(y in years){
   
-  # The mod_dat file
-  mod <- readRDS(m)
+  # print status
+  print(paste(y))
   
-  # Loop over 
-  # # need to filter by month and year first 
-  indiv <- unique(mod$ID)
+  # filter by year
+  x <- mod %>% 
+    filter(year == y)
   
+  for(m in months){
+    
+    # print status
+    print(paste(m))
+    
+    # filter by month
+    y <- x %>% 
+      filter(month == m)
+    
+    indiv <- unique(y$ID)
+    
   for(i in 1:length(indiv)){
     # Store in list
     print(paste(i, indiv[i]))
     # Subset individual data
-    dat <- mod %>% 
+    dat <- y %>% 
       filter(ID == indiv[i],
              case_ == "FALSE")
+    
     # Get mean avail. for each covariate
     # Store results for the current individual
-    res <- data.frame(ID = indiv[i],
+    temp <- data.frame(ID = indiv[i],
                       m_elev = mean(dat$Elevation),
                       m_snd = mean(dat$SND),
                       m_a.sin = mean(dat$Asp_sin),
@@ -87,12 +99,25 @@ for(m in mod_dats){
                       m_herb = mean(dat$Herb),
                       m_shrub = mean(dat$Shrub),
                       m_tree = mean(dat$Tree),
+                      # Mean scaled and centered
+                      m_SC_elev = mean(dat$scaled_Elev),
+                     # m__SC_snd = mean(dat$scaled_SND),
+                      m__SC_a.sin = mean(dat$scaled_Asp_sin),
+                      m__SC_a.cos = mean(dat$scaled_Asp_cos),
+                      m__SC_rough = mean(dat$scaled_Rough),
+                      m__SC_bio = mean(dat$scaled_RAP_bio),
+                      m__SC_herb = mean(dat$scaled_Herb),
+                      m__SC_shrub = mean(dat$scaled_Shrub),
+                      m_SC_tree = mean(dat$scaled_Tree),
                       # month and year 
                       month = unique(dat$month),
-                      year = unique(dat$year))
-    # Bind to the general results table
-    output <- rbind(output, res)
+                      year = unique(dat$year),
+                     row.names = NULL)
     
+    # Bind to the general results table
+    output <- bind_rows(temp, output)
+    
+     }
   }
 }
 
@@ -102,11 +127,10 @@ table(output$month)
 table(output$year)
 
 # Save as .rds 
-#saveRDS(output, "../RSF_data/final_outputs/20220714_m_avail_2021.rds")
-#write.csv(output, "../RSF_data/final_outputs/20220714_m_avail_2021.csv", row.names = FALSE)
+saveRDS(output, "Data/Outputs/RSF_outputs/20221011_m_avail.rds")
 
-out_dir <- "../../Data/Chapter1/20220723_ouptuts/"
-dir.create(out_dir)
-write.csv(output, "../../Data/Chapter1/20220723_ouptuts/20220723_m_avail.csv", row.names = FALSE)
+#out_dir <- "../../Data/Chapter1/20220723_ouptuts/"
+#dir.create(out_dir)
+#write.csv(output, "../../Data/Chapter1/20220723_ouptuts/20220723_m_avail.csv", row.names = FALSE)
 
 # DONE!

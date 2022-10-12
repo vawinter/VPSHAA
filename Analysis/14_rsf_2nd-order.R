@@ -29,6 +29,7 @@ ext <- extent(utah)
 
 # List covariate files
 #dir <- "../../../Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/10x10_Covariate_stacks/2021_stacks/"
+
 dir <- "https://usu.app.box.com/folder/165641313465"
 landscapes <- list.files(dir, full.names = T)
 
