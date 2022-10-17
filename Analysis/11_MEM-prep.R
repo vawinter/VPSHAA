@@ -25,7 +25,7 @@ library(MASS)
 library(lmerTest)
 
 # Load in data
-dat <- read.csv("../../Data/Chapter1/20220726-elev_files-10.6.csv",
+dat <- read.csv( "Data/Outputs/RSF_outputs/20221017-10.6.csv",
                 header = T, na.strings = c("", "N/A", "NA"))
 
 # Removing poor data folds
@@ -171,13 +171,13 @@ dat$weight_Tree <- temp / sum(temp, na.rm = TRUE)
 # Set logs
 #Scale and center
 ## RAP (bio) ----
-# a. find mean
-log_Bio_m <- mean(log(dat$m_bio), na.rm = T)
-# b. find sd
-log_Bio_sd <- sd(log(dat$m_bio), na.rm = T)
-#c. subtract and divide
-dat$scaled_log_RAP_bio <- ((log(dat$m_bio) - log_Bio_m)/ log_Bio_sd)
-
+# # a. find mean
+# log_Bio_m <- mean(log(dat$m_bio), na.rm = T)
+# # b. find sd
+# log_Bio_sd <- sd(log(dat$m_bio), na.rm = T)
+# #c. subtract and divide
+# dat$scaled_log_RAP_bio <- ((log(dat$m_bio) - log_Bio_m)/ log_Bio_sd)
+dat$scaled_log_RAP_bio <- log(dat$m__SC_bio)
 ## Shrub ----
 # a. find mean
 log_Shrub_m <- mean(log(dat$m_shrub), na.rm = T)
@@ -185,7 +185,7 @@ log_Shrub_m <- mean(log(dat$m_shrub), na.rm = T)
 log_Shrub_sd <- sd(log(dat$m_shrub), na.rm = T)
 #c. subtract and divide
 dat$scaled_log_Shrub <- ((log(dat$m_shrub) - log_Shrub_m)/ log_Shrub_sd)
-
+dat$scaled_log_Shrub <- log(dat$m__SC_shrub)
 ## Tree ----
 # a. find mean
 log_Tree_m <- mean(log(dat$m_tree), na.rm = T)
@@ -239,7 +239,7 @@ log_Road_sd <- sd(log(dat$m_road_no_0), na.rm = T)
 dat$scaled_log_Road <- ((log(dat$m_road_no_0) - log_Road_m)/ log_Road_sd)
 
 # Save output ----
-write.csv(dat, "../../Data/Chapter1/20220726_3rd-order_elev-MEM-prep.csv",
+write.csv(dat, "Data/Outputs/RSF_outputs/20221017_mem-prep.csv",
           row.names = FALSE)
 
 # Create data frame

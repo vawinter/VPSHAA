@@ -22,14 +22,14 @@ library(lmerTest)
 library(effects)
 
 # Load in data
-dat <- read.csv("20220719_outputs/20220718_MEM_prep.csv", header = T)
+dat <- read.csv("Data/Outputs/RSF_outputs/20221017_mem-prep-v2.csv", header = T)
 
 ## Elevation ----
 
 summary(Elev.mod.full <- lmer(Elev_beta ~ 0 + Intercept_beta_scale + 
                                 # Availabilities
-                                scaled_log_RAP_bio + scaled_log_SND +
-                                scaled_log_Elev +
+                                m_SC_bio + scaled_SND +
+                                m_SC_elev +
                                 scaled_log_Road +
                                 # Winter
                                 is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
@@ -72,9 +72,9 @@ dat$Elev.mod.prediction.full <- predict(Elev.mod.full, re.form = NA)
 summary(Rough.mod.full <- lmer(Rough_beta ~ 0 +
                                  Elev.mod.prediction.full + 
                                  # Availabilities
-                                 scaled_log_RAP_bio + scaled_log_SND +
-                                 scaled_log_Elev + scaled_log_Road +
-                                 scaled_log_Rough +
+                                 m_SC_bio + scaled_log_SND +
+                                 m_SC_elev + scaled_log_Road +
+                                 m_SC_rough +
                                  # Winter
                                  is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
                                  I(is.Winter * is.NorthCentral) + I(is.Winter * is.NorthMnt) +
@@ -120,9 +120,9 @@ summary(Herb.mod.full <- lmer(Herb_beta ~ 0 +
                                 Elev.mod.prediction.full +
                                 Rough.mod.prediction.full + 
                                 # Availabilities
-                                scaled_log_RAP_bio + scaled_log_SND +
-                                scaled_log_Elev + scaled_log_Road +
-                                scaled_log_Herb +
+                                m_SC_bio + scaled_log_SND +
+                                m_SC_elev + scaled_log_Road +
+                                m_SC_herb +
                                 # Winter
                                 is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
                                 I(is.Winter * is.NorthCentral) + I(is.Winter * is.NorthMnt) +
@@ -170,9 +170,9 @@ summary(Shrub.mod.full <- lmer(Shrub_beta ~ 0 +
                                  Rough.mod.prediction.full +
                                  Herb.mod.prediction.full +
                                  # Availabilities
-                                 scaled_log_RAP_bio + scaled_log_SND +
-                                 scaled_log_Elev + scaled_log_Road +
-                                 scaled_log_Shrub +
+                                 m_SC_bio + scaled_log_SND +
+                                 m_SC_elev + scaled_log_Road +
+                                 m_SC_shrub +
                                  # Winter
                                  is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
                                  I(is.Winter * is.NorthCentral) + I(is.Winter * is.NorthMnt) +
@@ -222,9 +222,9 @@ summary(Tree.mod.full <- lmer(Tree_beta ~ 0 +
                                 Herb.mod.prediction.full +
                                 Shrub.mod.prediction.full +
                                 # Availabilities
-                                scaled_log_RAP_bio + scaled_log_SND +
-                                scaled_log_Elev + scaled_log_Road +
-                                scaled_log_Tree + 
+                                m_SC_bio + scaled_log_SND +
+                                m_SC_elev + scaled_log_Road +
+                                m_SC_tree + 
                                 # Winter
                                 is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
                                 I(is.Winter * is.NorthCentral) + I(is.Winter * is.NorthMnt) +
@@ -276,9 +276,9 @@ summary(Asp_sin.mod.full <- lmer(Asp_sin_beta ~ 0 +
                                    Shrub.mod.prediction.full +
                                    Tree.mod.prediction.full +
                                    # Availabilities
-                                   scaled_log_RAP_bio + scaled_log_SND +
-                                   scaled_log_Elev + scaled_log_Road +
-                                   scaled_Asp_sin +
+                                   m_SC_bio + scaled_log_SND +
+                                   m_SC_elev + scaled_log_Road +
+                                   m_SC_a.sin +
                                    # Winter
                                    is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
                                    I(is.Winter * is.NorthCentral) + I(is.Winter * is.NorthMnt) +
@@ -333,9 +333,9 @@ summary(Asp_cos.mod.full <- lmer(Asp_cos_beta ~ 0 +
                                    Tree.mod.prediction.full +
                                    Asp_sin.mod.prediction.full +
                                    # Availabilities
-                                   scaled_log_RAP_bio + scaled_log_SND +
-                                   scaled_log_Elev + scaled_log_Road +
-                                   scaled_Asp_cos +
+                                   m_SC_bio + scaled_log_SND +
+                                   m_SC_elev + scaled_log_Road +
+                                   m_SC_a.cos +
                                    # Winter
                                    is.Winter + I(is.Winter * is.Male) + I(is.Winter * scaled_PDSI) +
                                    I(is.Winter * is.NorthCentral) + I(is.Winter * is.NorthMnt) +

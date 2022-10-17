@@ -36,7 +36,7 @@ library(MASS)
 library(lmerTest)
 
 # Source MEM script and pred function
-source("11_MEM-20220609.R")
+source("Analysis/11_MEM-full.R")
 
 # create a directory for the plots
 dir <- "../../Figures_and_Results/Chapter1/"

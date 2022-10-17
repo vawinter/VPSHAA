@@ -1,12 +1,14 @@
 
+# re-ran 10/17/2022
+
 # 3/9/2022 ------
 rm(list = ls())
 gc()
 library(dplyr)
 
 # Finding and fixing NA's
-dat <- read.csv("../../Data/Chapter1/20220726-elev_files-10.5.csv", header = T)
-
+#dat <- read.csv("Data/Outputs/RSF_outputs/20221013-10.5.csv", header = T)
+dat <- read.csv( "Data/Outputs/RSF_outputs/20221013-10.5.csv", header = T)
 
 # JOINING ----
 # join with fin table
@@ -90,4 +92,6 @@ fin <- fin2 %>%
 # fin[798, 2] <- "M"
 
 # Save ----
-write.csv(fin, "../../Data/Chapter1/20220726-elev_files-10.6.csv", row.names = FALSE)
+write.csv(fin,  "Data/Outputs/RSF_outputs/20221017-10.6.csv", row.names = FALSE)
+
+# Done!
