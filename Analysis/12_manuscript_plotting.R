@@ -39,16 +39,16 @@ library(lmerTest)
 source("Analysis/11_MEM-full.R")
 
 # create a directory for the plots
-dir <- "../../Figures_and_Results/Chapter1/"
-plot_dir <- paste0(dir, "partial_residuals/20220609/PDSI/")
+dir <- "Figures_and_Results/TWS/"
+plot_dir <- paste0(dir, "partial_residuals/PDSI/")
 if(!dir.exists(plot_dir)){dir.create(plot_dir, recursive = T)}
 
 # Get fit line ----
 # List seasons
 all_groups <- c("is.Winter", "is.Spring", "is.Summer", "is.Fall")
 # List models
-all_models <- c(Shrub.mod, Elev.mod, Herb.mod, Rough.mod, Tree.mod, Asp_sin.mod,
-                Asp_cos.mod)
+all_models <- c(Shrub.mod.full, Elev.mod.full, Herb.mod.full, Rough.mod.full, 
+                Tree.mod.full, Asp_sin.mod.full, Asp_cos.mod.full)
 
 # Empty df for storage
 fit_line <- data.frame()

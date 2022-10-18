@@ -7,7 +7,7 @@
 #------ linear mixed effects models -----X
 #---Scaling and centering of covariates--X
 #########################################X
-#--------------- 05/26/2022 -------------X
+#--------------- 10/17/2022 -------------X
 #########################################X
 
 # 1. Need to replace prcp with drought and add that to this final csv
