@@ -29,7 +29,7 @@ library(effects)
 # -------------------------------------------------X
 # ----------------- Generate Models ----------------
 # -------------------------------------------------X
-source("11_MEM_full.R")
+source("Analysis/11_MEM-full.R")
 
 # -------------------------------------------------X
 # ---- Coefficients, SE, & Confidence Intervals ---- 
@@ -184,7 +184,7 @@ conf_df %>%
   scale_color_gradientn(colors = my_pal,
                         limits = c(0, 0.05)) +
   labs(x = "Coefficient Estimate", y = "Category", col = "p-value") 
-ggsave("test.png", width = 6, height = 5, units = "in")
+#ggsave("test.png", width = 6, height = 5, units = "in")
 
 conf_df %>%
   ggplot(aes(y = model, col = p_value)) +
@@ -196,23 +196,23 @@ conf_df %>%
                         limits = c(0, 0.05)) +
   labs(x = "Coefficient Estimate", y = "Habitat Attribute", col = "p-value") +
   scale_y_discrete(limits = rev(unique(conf_df$model)),
-                   labels = rev(unique(conf_df$model))) 
-ggsave("20220719_outputs/test.png", width = 8, height = 6, units = "in")
+                   labels = rev(unique(conf_df$model)))
+#ggsave("20220719_outputs/test.png", width = 8, height = 6, units = "in")
 
 # boxplots
-dat %>% 
+dat %>%
   mutate(season = case_when(month == "2" ~ "Winter",
                             month == "4" ~ "Spring",
                             month == "7" ~ "Summer",
-                            month == "11" ~ "Fall")) %>% 
-ggplot(aes(x = season, y = Asp_cos_beta)) + 
+                            month == "11" ~ "Fall")) %>%
+ggplot(aes(x = season, y = Elev_beta)) +
   geom_boxplot(fill = "gray") +
   labs(x = "Season", y = "Selection Coefficient",
-       title = "Northing") +
+       title = "Elevation") +
   theme_bw() +
   theme(text = element_text(size = 20))  +
  # ylim(-1, 1) +
   theme(plot.title = element_text(hjust = 0.5))
 
 dir <- "Figures_and_Results/TWS/"
-ggsave(paste0(dir, "north_selc.png"), width = 8, height = 6, units = "in")
+gsave(paste0(dir, "north_selc.png"), width = 8, height = 6, units = "in")

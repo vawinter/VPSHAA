@@ -25,7 +25,7 @@ library(MASS)
 library(lmerTest)
 
 # Load in data
-dat <- read.csv( "Data/Outputs/RSF_outputs/20221017-10.6.csv",
+dat <- read.csv( "Data/Outputs/RSF_outputs/20221018-10.6.csv",
                 header = T, na.strings = c("", "N/A", "NA"))
 
 # Removing poor data folds
@@ -186,6 +186,7 @@ log_Shrub_sd <- sd(log(dat$m_shrub), na.rm = T)
 #c. subtract and divide
 dat$scaled_log_Shrub <- ((log(dat$m_shrub) - log_Shrub_m)/ log_Shrub_sd)
 dat$scaled_log_Shrub <- log(dat$m__SC_shrub)
+
 ## Tree ----
 # a. find mean
 log_Tree_m <- mean(log(dat$m_tree), na.rm = T)
@@ -239,7 +240,7 @@ log_Road_sd <- sd(log(dat$m_road_no_0), na.rm = T)
 dat$scaled_log_Road <- ((log(dat$m_road_no_0) - log_Road_m)/ log_Road_sd)
 
 # Save output ----
-write.csv(dat, "Data/Outputs/RSF_outputs/20221017_mem-prep.csv",
+write.csv(dat, "Data/Outputs/RSF_outputs/20221018_mem-prep.csv",
           row.names = FALSE)
 
 # Create data frame

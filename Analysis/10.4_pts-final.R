@@ -19,23 +19,17 @@ library(dplyr)# Read in files
 library(lubridate)
 
 # # directory
-dir <- "../RSF_data/test_outputs/"
-
-# list files
-# mod_files <- list.files(dir, full.names = T, pattern = "20220714")
-# mod_files <- list.files(dir, full.names = T)
-
 # read in files individually
-glm <- readRDS("Data/Outputs/RSF_outputs/20221011_eHSF_output.rds")
-avail <- readRDS("Data/Outputs/RSF_outputs/20221011_m_avail.rds")
+glm <- readRDS("Data/Outputs/RSF_outputs/20221018_eHSF_output.rds")
+avail <- readRDS("Data/Outputs/RSF_outputs/20221018_m_avail.rds")
 used <- read.csv("Data/Outputs/RSF_outputs/20220620_used.csv", header = T)
 road <- read.csv("Data/Outputs/RSF_outputs/20220620_road-data_comb.csv", header= T)
 pdsi <- read.csv("Data/Outputs/RSF_outputs/20220620_drought_comb.csv", header = T)
 
 
-# remove row of na and duplicate from avail
-avail <- avail[-1237,]
-avail <- avail[-1236,]
+# # remove row of na and duplicate from avail
+# avail <- avail[-1237,]
+# avail <- avail[-1236,]
 
 # make sure types match up
 avail$month <- as.integer(avail$month)
@@ -44,8 +38,8 @@ glm$month <- as.integer(glm$month)
 avail$year <- as.integer(avail$year)
 glm$year <- as.integer(glm$year)
 
-# get rid of duplicate column of tree in avail
-avail <- avail[,1:20]
+# # get rid of duplicate column of tree in avail
+# avail <- avail[,1:20]
 
 # Join together avail and used df
 x <- used %>% 
@@ -84,6 +78,6 @@ fin <- final %>%
 head(fin)
 
 # Save
-saveRDS(fin, "Data/Outputs/RSF_outputs/20221011_files-combined.rds")
+saveRDS(fin, "Data/Outputs/RSF_outputs/20221018_files-combined.rds")
 
 # DONE!

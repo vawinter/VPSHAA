@@ -24,7 +24,7 @@ library(stringr)
 
 ## Load in data ----
 # Test read
-fin <- readRDS("Data/Outputs/RSF_outputs/20221011_files-combined.rds")
+fin <- readRDS("Data/Outputs/RSF_outputs/20221018_files-combined.rds")
 head(fin)
 
 #a. Query the db 
@@ -117,7 +117,7 @@ ph2$ID <- as.factor(ph2$ID)
 
 fin2 <- fin %>% 
   # mutate year column to match
-  mutate( # create season column w/ cooresponding months
+  mutate( # create season column w/ corresponding months
     mig_season = case_when(
       # Winter mig = nov and feb
       # summer mig is apri and july
@@ -129,11 +129,12 @@ fin2 <- fin %>%
   merge(ph2, by = c("ID", "year", "mig_season")) %>% 
   #merge(stat_fix, by = c("ID", "year", "mig_tend")) %>% 
   # mutate mig status columns
-  mutate(is.mig = case_when(mig_tend == "1" ~ 1,
+  dplyr::mutate(
+         is.mig = case_when(mig_tend == "mig" ~ 1,
                             TRUE ~ 0),
-         is.res = case_when(mig_tend == "0" ~ 1,
+         is.res = case_when(mig_tend == "res" ~ 1,
                             TRUE ~ 0),
-         is.unk_mig = case_when(mig_tend == "0.5" ~ 1,
+         is.unk_mig = case_when(mig_tend == "unk" ~ 1,
                                 TRUE ~ 0),
          # add age class col
          is.Adult = case_when(.$age_class == "adult" ~ 1, TRUE ~ 0),
@@ -155,11 +156,11 @@ fin2 <- fin %>%
   ) %>%
   # remove unnecessary rows
   dplyr::select(-mig_season) %>% 
-  distinct()
+  distinct() 
 
 # Check
 head(fin2)
 
 # Save
-write.csv(fin2, "Data/Outputs/RSF_outputs/20221013-10.5.csv", row.names = FALSE)
+write.csv(fin2, "Data/Outputs/RSF_outputs/20221018-10.5.csv", row.names = FALSE)
 

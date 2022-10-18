@@ -21,7 +21,7 @@ gc()
 library(dplyr)
 
 # Load in data
-mod <-readRDS("Data/Processed/RSF_data/20221011_3rd-order_RSF-prep.rds")
+mod <-readRDS("Data/Processed/RSF_data/20221018_3rd-order_RSF-prep.rds")
 mod$SND[is.na(mod$SND)] <- 0
 mod$SND <- as.numeric(mod$SND)
 
@@ -122,12 +122,12 @@ for(y in years){
 }
 
 # Remove first row of NAs
-output <- output[-1, ]
+output <- output[-1236, ]
 table(output$month)
 table(output$year)
 
 # Save as .rds 
-saveRDS(output, "Data/Outputs/RSF_outputs/20221011_m_avail.rds")
+saveRDS(output, "Data/Outputs/RSF_outputs/20221018_m_avail.rds")
 
 #out_dir <- "../../Data/Chapter1/20220723_ouptuts/"
 #dir.create(out_dir)

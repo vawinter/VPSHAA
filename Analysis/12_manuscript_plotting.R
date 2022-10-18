@@ -148,12 +148,12 @@ elev.fall <- sub.dat %>%
 # questions 6/6: How to perform this over a list of predictors/intercepts?
 
 # Winter
-elev_no.int_wint <- my_predict(model = Elev.mod, data = elev.wint, ranef = TRUE, 
+elev_no.int_wint <- my_predict(model = Elev.mod.full, data = elev.wint, ranef = TRUE, 
                           partial_resid = TRUE, intercept = TRUE, 
                           target_predictor = "I(is.Winter * scaled_PDSI)", 
   target_intercept = c("is.Winter"))
 # Spring
-elev_no.int_spr <- my_predict(model = Elev.mod, data = elev.spr, ranef = TRUE, 
+elev_no.int_spr <- my_predict(model = Elev.mod.full, data = elev.spr, ranef = TRUE, 
                                partial_resid = TRUE, intercept = TRUE, 
                                target_predictor = "I(is.Spring * scaled_PDSI)", 
                                target_intercept = c("is.Spring", "I(is.Spring * is.res)"))

@@ -24,10 +24,9 @@ gc()
 
 # Load in packages
 library(dplyr)
-library(data.table)
 
 # Load in data ----
-RSF_dat <-  readRDS("Data/Processed/RSF_data/20221011_3rd-order_RSF-prep.rds")
+RSF_dat <-  readRDS("Data/Processed/RSF_data/20221018_3rd-order_RSF-prep.rds")
 
 # Set up loop ----
 # iterate over unique individual/month/year combinations
@@ -35,29 +34,23 @@ months <- unique(RSF_dat$month)
 years <- unique(RSF_dat$year)
 
 # DF for output ----
-# Update: glm doesn't include snow - 4/1
-# Update: glm doesn't include snow or bio now - 4/7
 glm_df <- data.frame(ID = NA,
                      # Fill with betas
                      Intercept_beta = NA,
                      Elev_beta = NA,
-                    # SND_beta = NA,
                      Asp_sin_beta = NA,
                      Asp_cos_beta = NA,
                      Rough_beta = NA,
-                     #RAP_bio_beta = NA,
                      Herb_beta = NA,
                      Shrub_beta = NA,
                      Tree_beta = NA,
                      # Fill with st. errors
                      Intercept_stder = NA,
                      Elev_stder = NA,
-                    # SND_stder = NA,
                      Asp_sin_stder = NA,
                      Asp_cos_stder = NA,
                      Rough_stder = NA,
-                    # RAP_bio_stder = NA,
-                     Herb_stder = NA,
+                      Herb_stder = NA,
                      Shrub_stder = NA,
                      Tree_stder = NA,
                      # month and year of GLM
@@ -108,22 +101,18 @@ for(m in months){
                      # Betas from GLM
                      Intercept_beta = coef(summary(mod))[, "Estimate"]["(Intercept)"],
                      Elev_beta = coef(summary(mod))[, "Estimate"]["scaled_Elev"],
-                  #   SND_beta = coef(summary(mod))[, "Estimate"]["SND"],
                      Asp_sin_beta = coef(summary(mod))[, "Estimate"]["scaled_Asp_sin"],
                      Asp_cos_beta = coef(summary(mod))[, "Estimate"]["scaled_Asp_cos"],
                      Rough_beta = coef(summary(mod))[, "Estimate"]["scaled_Rough"],
-                  #   RAP_bio_beta = coef(summary(mod))[, "Estimate"]["RAP_bio"],
                      Herb_beta = coef(summary(mod))[, "Estimate"]["scaled_Herb"],
                      Shrub_beta = coef(summary(mod))[, "Estimate"]["scaled_Shrub"],
                      Tree_beta = coef(summary(mod))[, "Estimate"]["scaled_Tree"],
                      # Fill with st. errors
                      Intercept_stder = coef(summary(mod))[, "Std. Error"]["(Intercept)"],
                      Elev_stder = coef(summary(mod))[, "Std. Error"]["scaled_Elev"],
-                  #   SND_stder = coef(summary(mod))[, "Std. Error"]["SND"],
                      Asp_sin_stder = coef(summary(mod))[, "Std. Error"]["scaled_Asp_sin"],
                      Asp_cos_stder = coef(summary(mod))[, "Std. Error"]["scaled_Asp_cos"],
                      Rough_stder = coef(summary(mod))[, "Std. Error"]["scaled_Rough"],
-                  #   RAP_bio_stder = coef(summary(mod))[, "Std. Error"]["RAP_bio"],
                      Herb_stder = coef(summary(mod))[, "Std. Error"]["scaled_Herb"],
                      Shrub_stder = coef(summary(mod))[, "Std. Error"]["scaled_Shrub"],
                      Tree_stder = coef(summary(mod))[, "Std. Error"]["scaled_Tree"],
@@ -152,11 +141,11 @@ glm_df <- glm_df[-1236, ]
 outdir <- "Data/Outputs/RSF_outputs/"
 #dir.create(outdir)
 
-saveRDS(glm_df, paste0(outdir, "20221011_eHSF_output.rds"))
+saveRDS(glm_df, paste0(outdir, "20221018_eHSF_output.rds"))
 
 
 # Test
-x <- readRDS("Data/Outputs/RSF_outputs/20221011_eHSF_output.rds")
+x <- readRDS("Data/Outputs/RSF_outputs/20221018_eHSF_output.rds")
 
 # DONE!
 

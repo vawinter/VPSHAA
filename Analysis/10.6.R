@@ -8,20 +8,20 @@ library(dplyr)
 
 # Finding and fixing NA's
 #dat <- read.csv("Data/Outputs/RSF_outputs/20221013-10.5.csv", header = T)
-dat <- read.csv( "Data/Outputs/RSF_outputs/20221013-10.5.csv", header = T)
+dat <- read.csv( "Data/Outputs/RSF_outputs/20221018-10.5.csv", header = T)
 
 # JOINING ----
 # join with fin table
 fin2 <- dat %>% 
   # mutate mig status columns
-  mutate(is.mig = case_when(mig_tend == "1" ~ 1,
+  mutate(is.mig = case_when(mig_tend == "mig" ~ 1,
                             TRUE ~ 0),
          # is.mig = case_when(tendency == "mig" ~ 1,
          #                    tendency == "nonmig" ~ 0,
          #                    tendency == "unk" ~ NA_real_), 
-         is.res = case_when(mig_tend == "0" ~ 1,
+         is.res = case_when(mig_tend == "res" ~ 1,
                             TRUE ~ 0),
-         is.unk_mig = case_when(mig_tend == "0.5" ~ 1,
+         is.unk_mig = case_when(mig_tend == "unk" ~ 1,
                                 TRUE ~ 0),
          # add age class col
          is.Adult = case_when(.$age_class == "adult" ~ 1, TRUE ~ 0),
@@ -92,6 +92,6 @@ fin <- fin2 %>%
 # fin[798, 2] <- "M"
 
 # Save ----
-write.csv(fin,  "Data/Outputs/RSF_outputs/20221017-10.6.csv", row.names = FALSE)
+write.csv(fin, "Data/Outputs/RSF_outputs/20221018-10.6.csv", row.names = FALSE)
 
 # Done!
