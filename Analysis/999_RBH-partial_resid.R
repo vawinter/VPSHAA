@@ -71,6 +71,7 @@ library(lme4)
 # mult 1.96 to SE
 
 # Ronan predict fun ----
+# Ronan predict fun ----
 my_predict <- function(model, data, ranef = TRUE, 
                        partial_resid = FALSE, intercept = FALSE, 
                        target_predictor = NULL, target_intercept = NULL){
@@ -255,5 +256,3 @@ my_predict <- function(model, data, ranef = TRUE,
   } # end of ifelse check for random effects
 } # end of function
 
-# 
-# # DONE!

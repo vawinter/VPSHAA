@@ -5,7 +5,7 @@
 #########################################X
 #---------- Figures and graphs ----------X
 #########################################X
-#--------------- 05/31/2022 -------------X
+#--------------- 10/18/2022 -------------X
 #########################################X
 
 # trying to figure out best graphical representation of data 
@@ -40,13 +40,10 @@ source("Analysis/11_MEM-full.R")
 
 # create a directory for the plots
 dir <- "Figures_and_Results/TWS/"
-plot_dir <- paste0(dir, "partial_residuals/PDSI/")
+plot_dir <- paste0(dir, "partial_residuals/Availability/")
 if(!dir.exists(plot_dir)){dir.create(plot_dir, recursive = T)}
 
-# Line function
-# List seasons
-groups <- c("is.Winter", "is.Spring", "is.Summer", "is.Fall")
-
+# Line fun ----
 line <- function(model = NULL, variable = NULL, xlim = c(-4, 4), ci_level = 0.95){
   pred_dat <- expand.grid(x = seq(xlim[1], xlim[2], length.out = 50),
                           group = c("is.Winter", "is.Spring", "is.Summer", "is.Fall"),
@@ -119,20 +116,16 @@ line <- function(model = NULL, variable = NULL, xlim = c(-4, 4), ci_level = 0.95
 
 
 # Subset data for predicting
-# Subset data for predicting
-sub.dat <- dat %>% 
- # filter(is.Female == 1) %>% 
-  mutate(tendency = case_when(mig_tend == "1" ~ "mig",
-                              mig_tend == "0" ~ "res",
-                              mig_tend == "0.5" ~ "unk")) %>% 
-  mutate(year = as.character(year))
+ sub.dat <- dat# %>% 
+#   # filter(is.Female == 1) %>% 
+#   mutate(tendency = case_when(mig_tend == "1" ~ "mig",
+#                               mig_tend == "0" ~ "res",
+#                               mig_tend == "0.5" ~ "unk")) %>% 
+#   mutate(year = as.character(year))
+
 
 # Subset fit line data
-elev_fit <- lapply(groups, function(g) {
-  line(model = Elev.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
+elev_fit <- line(model = Elev.mod.full, variable = "m_SC_elev")
 
 
 # Partial residuals --------------
@@ -146,29 +139,30 @@ elev.fall <- sub.dat %>%
   filter(is.Fall == 1)
 
 # ex: Elev model ----
-# calculate predication with no road effects and no intercepts
-# questions 6/6: How to perform this over a list of predictors/intercepts?
+# Issue: 10/18: Does random effect NEED to be true? getting an error in this case
+# -- works when ranef = F
 
 # Winter
-elev_no.int_wint <- my_predict(model = Elev.mod.full, data = elev.wint, ranef = TRUE, 
-                          partial_resid = TRUE, intercept = TRUE, 
-                          target_predictor = "I(is.Winter * scaled_PDSI)", 
-  target_intercept = c("is.Winter"))
+elev_no.int_wint <- my_predict(model = Elev.mod.full, data = elev.wint, ranef = F, 
+                               partial_resid = TRUE, intercept = TRUE, 
+                               target_predictor = "m_SC_elev", 
+                               target_intercept = c("is.Winter"))
 # Spring
-elev_no.int_spr <- my_predict(model = Elev.mod.full, data = elev.spr, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Spring * scaled_PDSI)", 
-                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
+elev_no.int_spr <- my_predict(model = Elev.mod.full, data = elev.spr, ranef = F, 
+                              partial_resid = TRUE, intercept = TRUE, 
+                              target_predictor = "m_SC_elev", 
+                              target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
-elev_no.int_sum<- my_predict(model = Elev.mod.full, data = elev.sum, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Summer * scaled_PDSI)", 
-                               target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
+elev_no.int_sum<- my_predict(model = Elev.mod.full, data = elev.sum, ranef = F, 
+                             partial_resid = TRUE, intercept = TRUE, 
+                             target_predictor = "m_SC_elev", 
+                             target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-elev_no.int_fall <- my_predict(model = Elev.mod.full, data = elev.fall, ranef = TRUE, 
+elev_no.int_fall <- my_predict(model = Elev.mod.full, data = elev.fall, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Fall * scaled_PDSI)", 
+                               target_predictor = "m_SC_elev", 
                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
+
 
 # abline
 # Winter
@@ -185,13 +179,13 @@ spr_line <- elev_fit %>%
 # Summer
 sum_line <- elev_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
-                            is.res == 1 ~ "Resident")) %>%
+                              is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Summer") %>% 
   distinct()
 # Fall
 fall_line <- elev_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
-                            is.res == 1 ~ "Resident")) %>%
+                              is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Fall") %>% 
   distinct()
 
@@ -216,33 +210,33 @@ wint <- elev.wint %>%
          sex_fix = case_when(sex == "M" ~ "Male",
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(sex_fix))) +
- # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Elev, col = as.factor(sex_fix))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
-  # this needs to be changed to abline
+  #  geom_point(aes(y = pred_observed, size = -weight_Elev)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1),
+  #                       labels = ~scales::comma(x = .x)) +
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
- # scale_color_manual(values = c("Range" = "#00BA38")) +
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
-  # scale_size_continuous(range = c(0.01, 1.2), 
-  #                       labels = ~scales::comma(x = -.x),
-  #                       name = "Weighted") +
+  # scale_size_continuous(range = c(0.01, 1.2),
+  #                         labels = ~scales::comma(x = -.x)) +
   labs(col = "", fill = "",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "Availablilty",
        subtitle = "Winter") +
   ggtitle("(a) Elevation") +
-  coord_cartesian(ylim = c(-20, 20),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
+  theme(#plot.title = element_text(hjust = 0.5),
+    legend.position = "right") +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
-
-## Spring ----
+ ## Spring ----
 spr <- elev.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
@@ -258,26 +252,28 @@ spr <- elev.spr %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Elev_beta - elev_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
-  # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Elev, col = as.factor(mig.tend))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   labs(col = "", fill = "",
-       y = "Selection Strength",
-       x = "Drought (PDSI)",
+       y = "",
+       x = "Availablilty",
        subtitle = "Spring") +
   ggtitle("(b) Elevation") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-20, 20),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_bw() +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 ## Summer ----
 sum <- elev.sum %>%
@@ -295,26 +291,29 @@ sum <- elev.sum %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Elev_beta - elev_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Elev, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
-   # this needs to be changed to abline
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   labs(col = "", fill = "",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "Availablilty",
        subtitle = "Summer") +
   ggtitle("(c) Elevation") +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-20, 20),  xlim = c(-2, 2)) +
   theme_bw() +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 # Fall ----
 fall <- elev.fall %>%
@@ -332,44 +331,50 @@ fall <- elev.fall %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Elev_beta - elev_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Elev, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.001, 0.009),
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   labs(col = "", fill = "", 
-       y = "Selection Strength",
-       x = "Drought (PDSI)",
+       y = "",
+       x = "Availablilty",
        subtitle = "Fall") +
   ggtitle("(d) Elevation") +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-20, 20),  xlim = c(-2, 2)) +
   theme_bw() +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots ----
 all.elev <- grid.arrange(wint, spr, sum, fall)
 
-# save output graph
-ggsave("elev_part_resid-seas.png", all.elev, path = plot_dir,
+# # save output graph
+ggsave("elev_part_resid.png", all.elev, path = plot_dir,
+       width = 6, height = 4,
+       unit = "in")
+
+
+ggsave("elev-fall.png", fall, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
-ggsave("elev_part_resid-fall.png", fall, path = plot_dir,
+ggsave("elev-wint.png", wint, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
-ggsave("elev_part_resid-wint.png", wint, path = plot_dir,
+ggsave("elev-sum.png", sum, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
-ggsave("elev_part_resid-sum.png", sum, path = plot_dir,
+ggsave("elev-spr.png", spr, path = plot_dir,
        width = 6, height = 4, unit = "in")
-
-ggsave("elev_part_resid-spr.png", spr, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
 
 # ex: Rough model -----
 # Partial residuals --------------
@@ -383,33 +388,29 @@ rough.sum <- sub.dat %>%
 rough.fall <- sub.dat %>% 
   filter(is.Fall == 1)
 
-rough_fit <- lapply(groups, function(g) {
-  line(model = Rough.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
-
+# Get line fit
+rough_fit <- line(model = Rough.mod.full, variable = "m_SC_rough")
 
 # Winter
-rough_no.int_wint <- my_predict(model = Rough.mod.full, data = rough.wint, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Winter * scaled_PDSI)", 
-                               target_intercept = c("is.Winter"))
+rough_no.int_wint <- my_predict(model = Rough.mod.full, data = rough.wint, ranef = F, 
+                                partial_resid = TRUE, intercept = TRUE, 
+                                target_predictor = "m_SC_rough", 
+                                target_intercept = "is.Winter")
 # Spring
-rough_no.int_spr <- my_predict(model = Rough.mod.full, data = rough.spr, ranef = TRUE, 
-                              partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "I(is.Spring * scaled_PDSI)", 
-                              target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
-# Summer
-rough_no.int_sum<- my_predict(model = Rough.mod.full, data = rough.sum, ranef = TRUE, 
-                             partial_resid = TRUE, intercept = TRUE, 
-                             target_predictor = "I(is.Summer * scaled_PDSI)", 
-                             target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
-# Fall
-rough_no.int_fall <- my_predict(model = Rough.mod.full, data = rough.fall, ranef = TRUE, 
+rough_no.int_spr <- my_predict(model = Rough.mod.full, data = rough.spr, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Fall * scaled_PDSI)", 
-                               target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
+                               target_predictor = "m_SC_rough", 
+                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
+# Summer
+rough_no.int_sum<- my_predict(model = Rough.mod.full, data = rough.sum, ranef = F, 
+                              partial_resid = TRUE, intercept = TRUE, 
+                              target_predictor = "m_SC_rough", 
+                              target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
+# Fall
+rough_no.int_fall <- my_predict(model = Rough.mod.full, data = rough.fall, ranef = F, 
+                                partial_resid = TRUE, intercept = TRUE, 
+                                target_predictor = "m_SC_rough", 
+                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
 # Winter
@@ -457,30 +458,30 @@ wint <- rough.wint %>%
          sex_fix = case_when(sex == "M" ~ "Male",
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(sex_fix))) +
-  # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Rough, col = as.factor(sex_fix))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
-   # scale_color_manual(values = c("Range" = "#00BA38")) +
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
   labs(col = "", fill = "", 
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Winter") +
   ggtitle("(a) Roughness") +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.75, 0.75),  xlim = c(-2, 2)) +
   theme_bw() +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
-   
-  
 
 ## Spring ----
 spr <- rough.spr %>%
@@ -498,30 +499,28 @@ spr <- rough.spr %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Rough_beta - rough_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
-  # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Rough, col = as.factor(mig.tend))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
-  scale_size_continuous(range = c(0.01, 1.2), 
-                        labels = ~scales::comma(x = -.x),
-                        name = "Weighted") +
-  labs(col = "", fill = "", size = "Weighted",
-       y = "Selection Strength",
-       x = "Drought (PDSI)",
+  labs(col = "", fill = "", 
+       y = "",
+       x = "log(Availability)",
        subtitle = "Spring") +
   ggtitle("(b) Roughness") +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.75, 0.75),  xlim = c(-2, 2)) +
   theme_bw() +
- # theme(plot.title = element_text(hjust = 0.5)) +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-
 ## Summer ----
 sum <- rough.sum %>%
   # Bin non Movers into Movers (based on MEM)
@@ -538,26 +537,28 @@ sum <- rough.sum %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Rough_beta - rough_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
-  # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Rough, col = as.factor(mig.tend))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
-  labs(col = "", fill = "",
+  labs(col = "", fill = "", 
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Summer") +
   ggtitle("(c) Roughness") +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.75, 0.75),  xlim = c(-2, 2)) +
   theme_bw() +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 # Fall ----
 fall <- rough.fall %>%
@@ -575,35 +576,35 @@ fall <- rough.fall %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Rough_beta - rough_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
-  # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Rough, col = as.factor(mig.tend))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
-  labs(col = "", fill = "",
-       y = "Selection Strength",
-       x = "Drought (PDSI)",
+  labs(col = "", fill = "", 
+       y = "",
+       x = "log(Availability)",
        subtitle = "Fall") +
   ggtitle("(d) Roughness") +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.75, 0.75),  xlim = c(-2, 2)) +
   theme_bw() +
- # theme(plot.title = element_text(hjust = 0.5)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 # Arrange plots
 all.rough <- grid.arrange(wint, spr, sum, fall)
 
 # save output graph
-ggsave("rough_part_resid-seas.png", all.rough, path = plot_dir,
+ggsave("rough_part_resid.png", all.rough, path = plot_dir,
        width = 6, height = 4, unit = "in")
-
 
 ggsave("rough_part_resid-fall.png", fall, path = plot_dir,
        width = 6, height = 4, unit = "in")
@@ -617,6 +618,8 @@ ggsave("rough_part_resid-sum.png", sum, path = plot_dir,
 ggsave("rough_part_resid-spr.png", spr, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
+
+
 # ex: Herb model -----
 # Partial residuals --------------
 # Separate the seasons
@@ -629,34 +632,29 @@ herb.sum <- sub.dat %>%
 herb.fall <- sub.dat %>% 
   filter(is.Fall == 1)
 
-# filter for fit line
-herb_fit <- lapply(groups, function(g) {
-  line(model = Herb.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
-
+# calculate for fit line
+herb_fit <- line(model = Herb.mod.full, variable = "m_SC_herb")
 
 # Winter
-herb_no.int_wint <- my_predict(model = Herb.mod.full, data = herb.wint, ranef = TRUE, 
-                                partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "I(is.Winter * scaled_PDSI)", 
-                                target_intercept = c("is.Winter"))
-# Spring
-herb_no.int_spr <- my_predict(model = Herb.mod.full, data = herb.spr, ranef = TRUE, 
+herb_no.int_wint <- my_predict(model = Herb.mod.full, data = herb.wint, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Spring * scaled_PDSI)", 
-                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
-# Summer
-herb_no.int_sum<- my_predict(model = Herb.mod.full, data = herb.sum, ranef = TRUE, 
+                               target_predictor = "m_SC_herb", 
+                               target_intercept = c("is.Winter"))
+# Spring
+herb_no.int_spr <- my_predict(model = Herb.mod.full, data = herb.spr, ranef = F, 
                               partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "I(is.Summer * scaled_PDSI)", 
-                              target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
+                              target_predictor = "m_SC_herb", 
+                              target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
+# Summer
+herb_no.int_sum<- my_predict(model = Herb.mod.full, data = herb.sum, ranef = F, 
+                             partial_resid = TRUE, intercept = TRUE, 
+                             target_predictor = "m_SC_herb", 
+                             target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-herb_no.int_fall <- my_predict(model = Herb.mod.full, data = herb.fall, ranef = TRUE, 
-                                partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "I(is.Fall * scaled_PDSI)", 
-                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
+herb_no.int_fall <- my_predict(model = Herb.mod.full, data = herb.fall, ranef = F, 
+                               partial_resid = TRUE, intercept = TRUE, 
+                               target_predictor = "m_SC_herb", 
+                               target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
 # Winter
@@ -702,31 +700,36 @@ wint <- herb.wint %>%
          # Find y-axis: observed - predictions 
          pred_observed = Herb_beta - herb_no.int_wint,
          sex_fix = case_when(sex == "M" ~ "Male",
-                    sex == "F" ~ "Female",
-                    sex == "U" ~ "Female")) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(sex_fix))) +
+                             sex == "F" ~ "Female",
+                             sex == "U" ~ "Female")) %>%
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Herb, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +#, col = "#00BA38") +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
-  labs(col = "", fill = "",# size = "Weighted",
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "", 
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "Availability",
        subtitle = "Winter") +
   ggtitle("(a) Herbaceous") +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.2, 0.2),  xlim = c(-2, 2)) +
   theme_bw() +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
+
 ## Spring ----
-spr <- herb.spr%>%
+spr <- herb.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -741,26 +744,29 @@ spr <- herb.spr%>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Herb_beta - herb_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Herb, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
   labs(col = "", fill = "", #size = "Weighted",
-       y = "Selection Strength",
-       x = "Drought (PDSI)",
+       y = "",
+       x = "Availability",
        subtitle = "Spring") +
   ggtitle("(b) Herbaceous") +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.2, 0.2),  xlim = c(-2, 2)) +
   theme_bw() +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 ## Summer ----
 sum <- herb.sum %>%
@@ -778,26 +784,29 @@ sum <- herb.sum %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Herb_beta - herb_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Herb, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
-  labs(col = "", fill = "",# size = "Weighted",
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "Availability",
        subtitle = "Summer") +
   ggtitle("(c) Herbaceous") +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.2, 0.2),  xlim = c(-2, 2)) +
   theme_bw() +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 # Fall ----
 fall <- herb.fall %>%
@@ -814,33 +823,36 @@ fall <- herb.fall %>%
                               (.$tendency == "NA") & (.$month == "2") ~ "Range",
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
-         pred_observed =Herb_beta - herb_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+         pred_observed = Herb_beta - herb_no.int_fall) %>%
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Herb, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
-  labs(col = "", fill = "", #size = "Weighted",
-       y = "Selection Strength",
-       x = "Drought (PDSI)",
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "",# size = "Weighted",
+       y = "",
+       x = "Availability",
        subtitle = "Fall") +
   ggtitle("(d) Herbaceous") +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.2, 0.2),  xlim = c(-2, 2)) +
   theme_bw() +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-   
 
 # Arrange plots
 all.herb <- grid.arrange(wint, spr, sum, fall)
 
-# save output graph
-ggsave("herb_part_resid-seas.png", all.herb, path = plot_dir,
+#save output graph
+ggsave("herb_part_resid.png", all.herb, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
 ggsave("herb_part_resid-fall.png", fall, path = plot_dir,
@@ -855,7 +867,6 @@ ggsave("herb_part_resid-sum.png", sum, path = plot_dir,
 ggsave("herb_part_resid-spr.png", spr, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
-
 # ex: Shrub model -----
 # Separate the seasons
 shrub.wint <- sub.dat %>% 
@@ -867,34 +878,29 @@ shrub.sum <- sub.dat %>%
 shrub.fall <- sub.dat %>% 
   filter(is.Fall == 1)
 
-# filter for fit line
-shrub_fit <- lapply(groups, function(g) {
-  line(model = Shrub.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
-
+# Calculate fit line
+shrub_fit <- line(model = Shrub.mod.full, variable = "scaled_log_Shrub")
 
 # Winter
 shrub_no.int_wint <- my_predict(model = Shrub.mod.full, data = shrub.wint, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Winter * scaled_PDSI)", 
-                               target_intercept = c("is.Winter"))
+                                partial_resid = TRUE, intercept = TRUE, 
+                                target_predictor = "scaled_log_Shrub", 
+                                target_intercept = c("is.Winter"))
 # Spring
 shrub_no.int_spr <- my_predict(model = Shrub.mod.full, data = shrub.spr, ranef = TRUE, 
-                              partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "I(is.Spring * scaled_PDSI)", 
-                              target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
+                               partial_resid = TRUE, intercept = TRUE, 
+                               target_predictor = "scaled_log_Shrub", 
+                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
 shrub_no.int_sum<- my_predict(model = Shrub.mod.full, data = shrub.sum, ranef = TRUE, 
-                             partial_resid = TRUE, intercept = TRUE, 
-                             target_predictor = "I(is.Summer * scaled_PDSI)", 
-                             target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
+                              partial_resid = TRUE, intercept = TRUE, 
+                              target_predictor = "scaled_log_Shrub", 
+                              target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
 shrub_no.int_fall <- my_predict(model = Shrub.mod.full, data = shrub.fall, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Fall * scaled_PDSI)", 
-                               target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
+                                partial_resid = TRUE, intercept = TRUE, 
+                                target_predictor = "scaled_log_Shrub", 
+                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
 # Winter
@@ -942,31 +948,35 @@ wint <- shrub.wint %>%
          sex_fix = case_when(sex == "M" ~ "Male",
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(sex_fix))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Shrub, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+ # geom_point(aes(y = pred_observed), col = "#00BA38") +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
-  geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
+  geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
-  labs(col = "", fill = "", 
+ # scale_color_manual(values = c("Range" = "#00BA38")) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Winter") +
   ggtitle("(a) Shrub") +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
   theme_bw() +
- # theme(plot.title = element_text(hjust = 0.5)) +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
-
 ## Spring ----
-spr <- shrub.spr%>%
+spr <- shrub.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -981,27 +991,29 @@ spr <- shrub.spr%>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Shrub_beta - shrub_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Shrub, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
-  labs(col = "", fill = "", 
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "",# size = "Weighted",
        y = "",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Spring") +
   ggtitle("(b) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-
 
 ## Summer ----
 sum <- shrub.sum %>%
@@ -1019,25 +1031,26 @@ sum <- shrub.sum %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Shrub_beta - shrub_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
-  # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Shrub, col = as.factor(mig.tend))) +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
-  labs(col = "", fill = "", 
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Summer") +
   ggtitle("(c) Shrub") +
-  ylim(c(-0.5, 0.5)) +
   theme(text = element_text(size = 15))  +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
   theme_bw() +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
@@ -1057,37 +1070,39 @@ fall <- shrub.fall %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Shrub_beta - shrub_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Shrub, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
-  labs(col = "", fill = "", 
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "", #size = "Weighted",
        y = "",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Fall") +
   ggtitle("(d) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
   theme_bw() +
- # theme(plot.title = element_text(hjust = 0.5)) +
+  #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-
 
 # Arrange plots
 all.shrub <- grid.arrange(wint, spr, sum, fall)
 dev.off()
 # save output graph
-ggsave("shrub_part_resid-seas.png", all.shrub, path = plot_dir,
+ggsave("shrub_part_resid.png", all.shrub, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
 ggsave("shrub_part_resid-fall.png", fall, path = plot_dir,
-width = 6, height = 4, unit = "in")
+       width = 6, height = 4, unit = "in")
 
 ggsave("shrub_part_resid-wint.png", wint, path = plot_dir,
        width = 6, height = 4, unit = "in")
@@ -1101,63 +1116,59 @@ ggsave("shrub_part_resid-spr.png", spr, path = plot_dir,
 
 # ex: Tree model -----
 # Separate the seasons
-tree.wint <- sub.dat %>% 
+Tree.wint <- sub.dat %>% 
   filter(is.Winter == 1)
-tree.spr <- sub.dat %>% 
+Tree.spr <- sub.dat %>% 
   filter(is.Spring == 1)
-tree.sum <- sub.dat %>% 
+Tree.sum <- sub.dat %>% 
   filter(is.Summer == 1)
-tree.fall <- sub.dat %>% 
+Tree.fall <- sub.dat %>% 
   filter(is.Fall == 1)
 
-# filter for fit line
-tree_fit <- lapply(groups, function(g) {
-  line(model = Tree.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
+# Calculate fit line
+Tree_fit <- line(model = Tree.mod.full, variable = "scaled_log_Tree")
 
 # Winter
-tree_no.int_wint <- my_predict(model = Tree.mod.full, data = tree.wint, ranef = TRUE, 
-                                partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "I(is.Winter * scaled_PDSI)", 
-                                target_intercept = c("is.Winter"))
-# Spring
-tree_no.int_spr <- my_predict(model = Tree.mod.full, data = tree.spr, ranef = TRUE, 
+Tree_no.int_wint <- my_predict(model = Tree.mod.full, data = Tree.wint, ranef = TRUE, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Spring * scaled_PDSI)", 
-                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
-# Summer
-tree_no.int_sum<- my_predict(model = Tree.mod.full, data = tree.sum, ranef = TRUE, 
+                               target_predictor = "scaled_log_Tree", 
+                               target_intercept = c("is.Winter"))
+# Spring
+Tree_no.int_spr <- my_predict(model = Tree.mod.full, data = Tree.spr, ranef = TRUE, 
                               partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "I(is.Summer * scaled_PDSI)", 
-                              target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
+                              target_predictor = "scaled_log_Tree", 
+                              target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
+# Summer
+Tree_no.int_sum<- my_predict(model = Tree.mod.full, data = Tree.sum, ranef = TRUE, 
+                             partial_resid = TRUE, intercept = TRUE, 
+                             target_predictor = "scaled_log_Tree", 
+                             target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-tree_no.int_fall <- my_predict(model = Tree.mod.full, data = tree.fall, ranef = TRUE, 
-                                partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "I(is.Fall * scaled_PDSI)", 
-                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
+Tree_no.int_fall <- my_predict(model = Tree.mod.full, data = Tree.fall, ranef = TRUE, 
+                               partial_resid = TRUE, intercept = TRUE, 
+                               target_predictor = "scaled_log_Tree", 
+                               target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
 # Winter
-wint_line <- tree_fit %>%
+wint_line <- Tree_fit %>%
   mutate(mig.tend = ifelse(group == "is.Winter", "Range", is.res)) %>%
   filter(group == "is.Winter") %>% 
   distinct()
 # Spring
-spr_line <- tree_fit %>%
+spr_line <- Tree_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
                               is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Spring") %>% 
   distinct()
 # Summer
-sum_line <- tree_fit %>%
+sum_line <- Tree_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
                               is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Summer") %>% 
   distinct()
 # Fall
-fall_line <- tree_fit %>%
+fall_line <- Tree_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
                               is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Fall") %>% 
@@ -1166,7 +1177,7 @@ fall_line <- tree_fit %>%
 
 # Plot -----
 ## Winter ----
-wint <- tree.wint %>%
+wint <- Tree.wint %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1180,34 +1191,40 @@ wint <- tree.wint %>%
                               (.$tendency == "NA") & (.$month == "2") ~ "Range",
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
-         pred_observed = Shrub_beta - shrub_no.int_wint,
+         pred_observed = Tree_beta - Tree_no.int_wint,
          sex_fix = case_when(sex == "M" ~ "Male",
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(sex_fix))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Tree, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
-  # scale_size(range = c(0.002, 0.008)) +
+  geom_point(aes(y = pred_observed )) +
+  # scale_alpha(range = c(0.002, 0.008)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
-  geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
+  geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
-  labs(col = "", fill = "",
+  #scale_color_manual(values = c("Range" = "#00BA38")) +
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "",# size = "Weighted",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Winter") +
-  ggtitle("(i) Tree")  +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-2, 2)) +
+  ggtitle("(a) Tree") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
   theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
+
 ## Spring ----
-spr <- tree.spr%>%
+spr <- Tree.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1221,30 +1238,33 @@ spr <- tree.spr%>%
                               (.$tendency == "NA") & (.$month == "2") ~ "Range",
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
-         pred_observed =  Tree_beta - tree_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+         pred_observed =  Tree_beta - Tree_no.int_spr) %>%
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Tree, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
-  labs(col = "", fill = "", 
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "",# size = "Weighted",
        y = "",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Spring") +
-  ggtitle("(j) Tree") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-2, 2)) +
+  ggtitle("(b) Tree") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
   theme_bw() +
- # theme(plot.title = element_text(hjust = 0.5)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
-
 ## Summer ----
-sum <- tree.sum %>%
+sum <- Tree.sum %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1258,30 +1278,33 @@ sum <- tree.sum %>%
                               (.$tendency == "NA") & (.$month == "2") ~ "Range",
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
-         pred_observed =  Tree_beta - tree_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+         pred_observed =  Tree_beta - Tree_no.int_sum) %>%
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Tree, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
-  labs(col = "", fill = "", 
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Summer") +
-  ggtitle("(k) Tree") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-2, 2)) +
+  ggtitle("(c) Tree") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
   theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
-
 # Fall ----
-fall <- tree.fall %>%
+fall <- Tree.fall %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1295,34 +1318,49 @@ fall <- tree.fall %>%
                               (.$tendency == "NA") & (.$month == "2") ~ "Range",
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
-         pred_observed = Tree_beta - tree_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+         pred_observed = Tree_beta - Tree_no.int_fall) %>%
+  # Plot against avail
+  ggplot(aes(x = scaled_log_Tree, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed)) +
+  geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
-  labs(col = "", fill = "", 
+  # scale_size_continuous(range = c(0.01, 1.2), 
+  #                       labels = ~scales::comma(x = -.x),
+  #                       name = "Weighted") +
+  labs(col = "", fill = "",# size = "Weighted",
        y = "",
-       x = "Drought (PDSI)",
+       x = "log(Availability)",
        subtitle = "Fall") +
-  ggtitle("(l) Tree") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-2, 2)) +
+  ggtitle("(d) Tree") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
   theme_bw() +
- # theme(plot.title = element_text(hjust = 0.5)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots
-all.tree <- grid.arrange(wint, spr, sum, fall)
+all.Tree <- grid.arrange(wint, spr, sum, fall)
 dev.off()
 # save output graph
-ggsave("tree_part_resid-seas.png", all.tree, path = plot_dir,
+ggsave("Tree_part_resid-seas.png", all.Tree, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
+ggsave("Tree_part_resid-spr.png", spr, path = plot_dir,
+       width = 6, height = 4, unit = "in")
+
+ggsave("Tree_part_resid-fall.png", fall, path = plot_dir,
+       width = 6, height = 4, unit = "in")
+
+ggsave("Tree_part_resid-sum.png", sum, path = plot_dir,
+       width = 6, height = 4, unit = "in")
+
+ggsave("Tree_part_resid-win.png", wint, path = plot_dir,
+       width = 6, height = 4, unit = "in")
 
 # ex: Aspect (sin) -----
 # Separate the seasons
@@ -1335,35 +1373,29 @@ Asp_sin.sum <- sub.dat %>%
 Asp_sin.fall <- sub.dat %>% 
   filter(is.Fall == 1)
 
-# filter for fit line
-Asp_sin_fit <- lapply(groups, function(g) {
-  line(model = Asp_sin.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
-
+# Calculate fit line
+Asp_sin_fit <- line(model = Asp_sin.mod.full, variable = "scaled_Asp_sin")
 
 # Winter
 Asp_sin_no.int_wint <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.wint, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Winter * scaled_PDSI)", 
-                               target_intercept = c("is.Winter"))
+                                  partial_resid = TRUE, intercept = TRUE, 
+                                  target_predictor = "scaled_Asp_sin", 
+                                  target_intercept = c("is.Winter"))
 # Spring
 Asp_sin_no.int_spr <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.spr, ranef = TRUE, 
-                              partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "I(is.Spring * scaled_PDSI)", 
-                              target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
+                                 partial_resid = TRUE, intercept = TRUE, 
+                                 target_predictor = "scaled_Asp_sin", 
+                                 target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
 Asp_sin_no.int_sum<- my_predict(model = Asp_sin.mod.full, data = Asp_sin.sum, ranef = TRUE, 
-                             partial_resid = TRUE, intercept = TRUE, 
-                             target_predictor = "I(is.Summer * scaled_PDSI)", 
-                             target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
+                                partial_resid = TRUE, intercept = TRUE, 
+                                target_predictor = "scaled_Asp_sin", 
+                                target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
 Asp_sin_no.int_fall <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.fall, ranef = TRUE, 
-                               partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "I(is.Fall * scaled_PDSI)", 
-                               target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
-
+                                  partial_resid = TRUE, intercept = TRUE, 
+                                  target_predictor = "scaled_Asp_sin", 
+                                  target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
 # Winter
@@ -1408,28 +1440,26 @@ wint <- Asp_sin.wint %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Asp_sin_beta - Asp_sin_no.int_wint) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_sin, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed), col = "#00BA38") +
-  # scale_size(range = c(0.002, 0.008)) +
+  # scale_alpha(range = c(0.002, 0.008)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
-  geom_line(aes(x = x, y = upr, color = "Range"),linetype = "dashed", data = wint_line) +
+  geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   scale_color_manual(values = c("Range" = "#00BA38")) +
   labs(col = "", fill = "", 
        y = "Eastness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Winter") +
-  ylim(c(-6, 6)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-
 
 ## Spring ----
 spr <- Asp_sin.spr%>%
@@ -1447,21 +1477,20 @@ spr <- Asp_sin.spr%>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Asp_sin_beta - Asp_sin_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_sin, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = spr_line) +
-  labs(col = "", fill = "",
+  geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
+  labs(col = "", fill = "", 
        y = "Eastness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Spring") +
-  ylim(c(-6, 6)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1482,21 +1511,20 @@ sum <- Asp_sin.sum %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Asp_sin_beta - Asp_sin_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_sin, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = sum_line) +
+  geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   labs(col = "", fill = "", 
        y = "Eastness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Summer") +
-  ylim(c(-6, 6)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1518,29 +1546,27 @@ fall <- Asp_sin.fall %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Asp_sin_beta - Asp_sin_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_sin, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = fall_line) +
+  geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   labs(col = "", fill = "", 
        y = "Eastness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Fall") +
-  ylim(c(-6, 6)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
+
 # Arrange plots
 all.Asp_sin <- grid.arrange(wint, spr, sum, fall)
-
-
 
 # save output graph
 ggsave("Asp_sin_part_resid-seas.png", all.Asp_sin, path = plot_dir,
@@ -1557,35 +1583,29 @@ Asp_cos.sum <- sub.dat %>%
 Asp_cos.fall <- sub.dat %>% 
   filter(is.Fall == 1)
 
-# filter for fit line
-Asp_cos_fit <- lapply(groups, function(g) {
-  line(model = Asp_cos.mod.full, variable = paste0("I(", g, " * scaled_PDSI)")) %>% 
-    filter(group == g)
-}) %>% 
-  bind_rows()
+# Calculate fit line
+Asp_cos_fit <- line(model = Asp_cos.mod.full, variable = "scaled_Asp_cos")
 
-# Winter
 # Winter
 Asp_cos_no.int_wint <- my_predict(model = Asp_cos.mod.full, data = Asp_cos.wint, ranef = TRUE, 
                                   partial_resid = TRUE, intercept = TRUE, 
-                                  target_predictor = "I(is.Winter * scaled_PDSI)", 
+                                  target_predictor = "scaled_Asp_cos", 
                                   target_intercept = c("is.Winter"))
 # Spring
 Asp_cos_no.int_spr <- my_predict(model = Asp_cos.mod.full, data = Asp_cos.spr, ranef = TRUE, 
                                  partial_resid = TRUE, intercept = TRUE, 
-                                 target_predictor = "I(is.Spring * scaled_PDSI)", 
+                                 target_predictor = "scaled_Asp_cos", 
                                  target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
 Asp_cos_no.int_sum<- my_predict(model = Asp_cos.mod.full, data = Asp_cos.sum, ranef = TRUE, 
                                 partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "I(is.Summer * scaled_PDSI)", 
+                                target_predictor = "scaled_Asp_cos", 
                                 target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
 Asp_cos_no.int_fall <- my_predict(model = Asp_cos.mod.full, data = Asp_cos.fall, ranef = TRUE, 
                                   partial_resid = TRUE, intercept = TRUE, 
-                                  target_predictor = "I(is.Fall * scaled_PDSI)", 
+                                  target_predictor = "scaled_Asp_cos", 
                                   target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
-
 
 # abline
 # Winter
@@ -1630,30 +1650,29 @@ wint <- Asp_cos.wint %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Asp_cos_beta - Asp_cos_no.int_wint) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_cos, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed), col = "#00BA38") +
-  # scale_size(range = c(0.002, 0.008)) +
+  # scale_alpha(range = c(0.002, 0.008)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
-  geom_line(aes(x = x, y = upr), linetype = "dashed", data = wint_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = wint_line) +
+  geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
+  geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   scale_color_manual(values = c("Range" = "#00BA38")) +
   labs(col = "", fill = "", 
        y = "Northness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Winter") +
-  ylim(c(-8, 8)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-7, 7),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 ## Spring ----
-spr <- Asp_cos.spr%>%
+spr <- Asp_cos.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1668,26 +1687,24 @@ spr <- Asp_cos.spr%>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Asp_cos_beta - Asp_cos_no.int_spr) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_cos, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = spr_line) +
+  geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   labs(col = "", fill = "", 
        y = "Northness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Spring") +
-  ylim(c(-8, 8)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-7, 7),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-
 
 ## Summer ----
 sum <- Asp_cos.sum %>%
@@ -1705,26 +1722,24 @@ sum <- Asp_cos.sum %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed =  Asp_cos_beta - Asp_cos_no.int_sum) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_cos, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = sum_line) +
-  labs(col = "", fill = "", 
+  geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
+  labs(col = "", fill = "",
        y = "Northness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Summer") +
-  ylim(c(-8, 8)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-7, 7),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
-
 
 # Fall ----
 fall <- Asp_cos.fall %>%
@@ -1742,21 +1757,20 @@ fall <- Asp_cos.fall %>%
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
          pred_observed = Asp_cos_beta - Asp_cos_no.int_fall) %>%
-  # Plot against PDSI
-  ggplot(aes(x = scaled_PDSI, col = as.factor(mig.tend))) +
+  # Plot against avail
+  ggplot(aes(x = scaled_Asp_cos, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
-  geom_line(aes(x = x, y = lwr),linetype = "dashed", data = fall_line) +
+  geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   labs(col = "", fill = "", 
        y = "Northness",
-       x = "Drought (PDSI)") +
+       x = "log(Availability)") +
   ggtitle("Fall") +
-  ylim(c(-8, 8)) +
-  # xlim(c(-2, 4)) +
+  coord_cartesian(ylim = c(-7, 7),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1770,6 +1784,15 @@ ggsave("Asp_cos_part_resid-seas.png", all.Asp_cos, path = plot_dir,
        width = 6, height = 4, unit = "in")
 
 
+# Put plots together -----
+plot_all <- gridExtra::grid.arrange(all.elev, all.rough, all.herb,
+                                    all.shrub, all.Tree,
+                                    all.Asp_sin, all.Asp_cos)
+dev.off()
+# save output graph
+ggsave("All_part_resid-seas.png", plot_all, path = plot_dir,
+       width = 12, height = 14, unit = "in")
+
 # static ----
 plot_static <- gridExtra::grid.arrange(all.elev, all.rough)
 dev.off()
@@ -1778,9 +1801,87 @@ ggsave("Static_part_resid.png", plot_static, path = plot_dir,
        width = 12, height = 10, unit = "in")
 
 # Dynamic -----
-plot_dy2 <- gridExtra::grid.arrange(all.herb, all.shrub, all.tree)
+plot_dy <- gridExtra::grid.arrange(all.herb,
+                                   all.shrub, all.Tree)
 dev.off()
 # save output graph
-ggsave("Dynamic_part_resid-seas.png", plot_dy2, path = plot_dir,
+ggsave("Dynamic_part_resid-seas.png", plot_dy, path = plot_dir,
        width = 12, height = 14, unit = "in")
+# Brian code
+# Use data from '12_avail-manuscript_plotting.R'
+
+head(elev.wint)
+
+dd <- elev.wint
+
+dd$is.Winter <- 0
+dd$scaled_log_Elev2 <- dd$scaled_log_Elev
+# dd$scaled_log_Elev <- 0
+dd$pred <- predict(Elev.mod.full, newdata = dd)
+
+ggplot(dd, aes(x = scaled_log_Elev2, y = pred)) +
+  geom_point() +
+  coord_cartesian(xlim = c(-4, 4), ylim = c(-0.04, 0.04))
+
+
+# # Create fit line for availability ----
+# line <- function(model = NULL, variable = NULL){
+#   
+#   # list seasons
+#   all_groups <- c("is.Winter", "is.Spring", "is.Summer", "is.Fall")
+#   
+#   # variable = variable
+#   variable <- variable
+#   
+#   # est data frame
+#   avail_line <-  data.frame()
+#   
+#   ## Loop over seasons ----
+#   for(i in 1:length(all_groups)){
+#     # Select single season
+#     group <- all_groups[i]
+#     
+#     # Grab coeff information
+#     beta <- summary(model)$coefficients %>%
+#       as.data.frame()
+#     beta <- beta %>%
+#       dplyr::mutate(Fixed_Effects = row.names(beta)) %>%
+#       dplyr::relocate(Fixed_Effects, .before = Estimate)
+#     row.names(beta) <- NULL
+#     
+#     # Find intercept
+#     int <- beta$Estimate[which(beta$Fixed_Effects %in% group)]
+#     # Find slope
+#     slope <- beta$Estimate[which(beta$Fixed_Effects %in% variable)]
+#     
+#     # If Winter, no distinction between movement classification
+#     if(group == "is.Winter"){
+#       int_adjust = 0
+#     } else{
+#       # If not Winter, intercept adjustment for movement classification
+#       int_adjust <- beta$Estimate[which(beta$Fixed_Effects %in% paste0("I(", group, " * is.res)"))]
+#     } # end if else
+#     # Temporary df to store results
+#     temp <- data.frame(avail = c(-4, 4),
+#                        # Season
+#                        group = group,
+#                        # Movement
+#                        is.res = c(0, 1)) %>%
+#       expand.grid() %>%
+#       distinct() %>%
+#       # Calculate intercept/intercept adjustment
+#       mutate(intercept = ifelse(is.res == 0, int, int + int_adjust),
+#              # slope = slope since PDSI does not directly interact w/ movement
+#              slope = slope) %>%
+#       # y axis for fit line
+#       mutate(y = (slope * avail) + intercept)
+#     
+#     # Combine df together
+#     avail_line <- rbind(avail_line, temp)
+#     
+#   } # end loop
+#   
+#   return(avail_line)
+# } # end line function
+
 
