@@ -205,14 +205,14 @@ dat %>%
                             month == "4" ~ "Spring",
                             month == "7" ~ "Summer",
                             month == "11" ~ "Fall")) %>%
-ggplot(aes(x = season, y = Elev_beta)) +
+ggplot(aes(x = season, y = Asp_sin_beta)) +
   geom_boxplot(fill = "gray") +
   labs(x = "Season", y = "Selection Coefficient",
-       title = "Elevation") +
+       title = "Easting") +
   theme_bw() +
   theme(text = element_text(size = 20))  +
  # ylim(-1, 1) +
   theme(plot.title = element_text(hjust = 0.5))
 
 dir <- "Figures_and_Results/TWS/"
-gsave(paste0(dir, "north_selc.png"), width = 8, height = 6, units = "in")
+ggsave(paste0(dir, "Shrub_selc.png"), width = 8, height = 6, units = "in")

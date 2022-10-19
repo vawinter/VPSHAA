@@ -148,22 +148,22 @@ elev.fall <- sub.dat %>%
 # questions 6/6: How to perform this over a list of predictors/intercepts?
 
 # Winter
-elev_no.int_wint <- my_predict(model = Elev.mod.full, data = elev.wint, ranef = TRUE, 
+elev_no.int_wint <- my_predict(model = Elev.mod.full, data = elev.wint, ranef = F, 
                           partial_resid = TRUE, intercept = TRUE, 
                           target_predictor = "I(is.Winter * scaled_PDSI)", 
   target_intercept = c("is.Winter"))
 # Spring
-elev_no.int_spr <- my_predict(model = Elev.mod.full, data = elev.spr, ranef = TRUE, 
+elev_no.int_spr <- my_predict(model = Elev.mod.full, data = elev.spr, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
                                target_predictor = "I(is.Spring * scaled_PDSI)", 
                                target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
-elev_no.int_sum<- my_predict(model = Elev.mod, data = elev.sum, ranef = TRUE, 
+elev_no.int_sum<- my_predict(model = Elev.mod.full, data = elev.sum, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
                                target_predictor = "I(is.Summer * scaled_PDSI)", 
                                target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-elev_no.int_fall <- my_predict(model = Elev.mod, data = elev.fall, ranef = TRUE, 
+elev_no.int_fall <- my_predict(model = Elev.mod.full, data = elev.fall, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
                                target_predictor = "I(is.Fall * scaled_PDSI)", 
                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))

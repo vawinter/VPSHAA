@@ -154,7 +154,7 @@ elev_no.int_spr <- my_predict(model = Elev.mod.full, data = elev.spr, ranef = F,
                               target_predictor = "m_SC_elev", 
                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
-elev_no.int_sum<- my_predict(model = Elev.mod.full, data = elev.sum, ranef = F, 
+elev_no.int_sum <- my_predict(model = Elev.mod.full, data = elev.sum, ranef = F, 
                              partial_resid = TRUE, intercept = TRUE, 
                              target_predictor = "m_SC_elev", 
                              target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
@@ -171,18 +171,21 @@ wint_line <- elev_fit %>%
   mutate(mig.tend = ifelse(group == "is.Winter", "Range", is.res)) %>%
   filter(group == "is.Winter") %>% 
   distinct()
+
 # Spring
 spr_line <- elev_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
                               is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Spring") %>% 
   distinct()
+
 # Summer
 sum_line <- elev_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
                               is.res == 1 ~ "Resident")) %>%
   filter(group == "is.Summer") %>% 
   distinct()
+
 # Fall
 fall_line <- elev_fit %>%
   mutate(mig.tend = case_when(is.res == 0 ~ "Mover",
@@ -212,7 +215,7 @@ wint <- elev.wint %>%
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Elev, col = as.factor(sex_fix))) +
+  ggplot(aes(x = m_SC_elev, col = as.factor(sex_fix))) +
   # add in predictions
   #  geom_point(aes(y = pred_observed, size = -weight_Elev)) +
   geom_point(aes(y = pred_observed )) +
@@ -254,7 +257,7 @@ spr <- elev.spr %>%
          # Find y-axis: observed - predictions 
          pred_observed = Elev_beta - elev_no.int_spr) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Elev, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_elev, col = as.factor(mig.tend))) +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
   # scale_size_continuous(range = c(0.01, 1.2), 
@@ -293,7 +296,7 @@ sum <- elev.sum %>%
          # Find y-axis: observed - predictions 
          pred_observed = Elev_beta - elev_no.int_sum) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Elev, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_elev, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -333,7 +336,7 @@ fall <- elev.fall %>%
          # Find y-axis: observed - predictions 
          pred_observed = Elev_beta - elev_no.int_fall) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Elev, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_elev, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -460,7 +463,7 @@ wint <- rough.wint %>%
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Rough, col = as.factor(sex_fix))) +
+  ggplot(aes(x = m_SC_rough, col = as.factor(sex_fix))) +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
   # scale_size_continuous(range = c(0.01, 1.2), 
@@ -476,7 +479,7 @@ wint <- rough.wint %>%
        x = "log(Availability)",
        subtitle = "Winter") +
   ggtitle("(a) Roughness") +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2))+
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -501,7 +504,7 @@ spr <- rough.spr %>%
          # Find y-axis: observed - predictions 
          pred_observed = Rough_beta - rough_no.int_spr) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Rough, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_rough, col = as.factor(mig.tend))) +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
   # scale_size_continuous(range = c(0.01, 1.2), 
@@ -516,7 +519,7 @@ spr <- rough.spr %>%
        x = "log(Availability)",
        subtitle = "Spring") +
   ggtitle("(b) Roughness") +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -539,7 +542,7 @@ sum <- rough.sum %>%
          # Find y-axis: observed - predictions 
          pred_observed = Rough_beta - rough_no.int_sum) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Rough, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_rough, col = as.factor(mig.tend))) +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
   # scale_size_continuous(range = c(0.01, 1.2), 
@@ -554,7 +557,7 @@ sum <- rough.sum %>%
        x = "log(Availability)",
        subtitle = "Summer") +
   ggtitle("(c) Roughness") +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -578,7 +581,7 @@ fall <- rough.fall %>%
          # Find y-axis: observed - predictions 
          pred_observed = Rough_beta - rough_no.int_fall) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Rough, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_rough, col = as.factor(mig.tend))) +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
   # scale_size_continuous(range = c(0.01, 1.2), 
@@ -593,7 +596,7 @@ fall <- rough.fall %>%
        x = "log(Availability)",
        subtitle = "Fall") +
   ggtitle("(d) Roughness") +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -704,7 +707,7 @@ wint <- herb.wint %>%
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Herb, col = as.factor(sex_fix))) +
+  ggplot(aes(x = m_SC_herb, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +#, col = "#00BA38") +
@@ -746,7 +749,7 @@ spr <- herb.spr %>%
          # Find y-axis: observed - predictions 
          pred_observed =  Herb_beta - herb_no.int_spr) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Herb, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_herb, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -786,7 +789,7 @@ sum <- herb.sum %>%
          # Find y-axis: observed - predictions 
          pred_observed =  Herb_beta - herb_no.int_sum) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Herb, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_herb, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -826,7 +829,7 @@ fall <- herb.fall %>%
          # Find y-axis: observed - predictions 
          pred_observed = Herb_beta - herb_no.int_fall) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Herb, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_herb, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -880,27 +883,27 @@ shrub.fall <- sub.dat %>%
   filter(is.Fall == 1)
 
 # Calculate fit line
-shrub_fit <- line(model = Shrub.mod.full, variable = "scaled_log_Shrub")
+shrub_fit <- line(model = Shrub.mod.full, variable = "m_SC_shrub")
 
 # Winter
-shrub_no.int_wint <- my_predict(model = Shrub.mod.full, data = shrub.wint, ranef = TRUE, 
+shrub_no.int_wint <- my_predict(model = Shrub.mod.full, data = shrub.wint, ranef = F, 
                                 partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "scaled_log_Shrub", 
+                                target_predictor = "m_SC_shrub", 
                                 target_intercept = c("is.Winter"))
 # Spring
-shrub_no.int_spr <- my_predict(model = Shrub.mod.full, data = shrub.spr, ranef = TRUE, 
+shrub_no.int_spr <- my_predict(model = Shrub.mod.full, data = shrub.spr, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "scaled_log_Shrub", 
+                               target_predictor = "m_SC_shrub", 
                                target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
-shrub_no.int_sum<- my_predict(model = Shrub.mod.full, data = shrub.sum, ranef = TRUE, 
+shrub_no.int_sum<- my_predict(model = Shrub.mod.full, data = shrub.sum, ranef = F, 
                               partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "scaled_log_Shrub", 
+                              target_predictor = "m_SC_shrub", 
                               target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-shrub_no.int_fall <- my_predict(model = Shrub.mod.full, data = shrub.fall, ranef = TRUE, 
+shrub_no.int_fall <- my_predict(model = Shrub.mod.full, data = shrub.fall, ranef = F, 
                                 partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "scaled_log_Shrub", 
+                                target_predictor = "m_SC_shrub", 
                                 target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
@@ -950,7 +953,7 @@ wint <- shrub.wint %>%
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Shrub, col = as.factor(sex_fix))) +
+  ggplot(aes(x = m_SC_shrub, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
  # geom_point(aes(y = pred_observed), col = "#00BA38") +
@@ -969,7 +972,7 @@ wint <- shrub.wint %>%
        x = "log(Availability)",
        subtitle = "Winter") +
   ggtitle("(a) Shrub") +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -993,7 +996,7 @@ spr <- shrub.spr %>%
          # Find y-axis: observed - predictions 
          pred_observed =  Shrub_beta - shrub_no.int_spr) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Shrub, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_shrub, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -1010,7 +1013,7 @@ spr <- shrub.spr %>%
        subtitle = "Spring") +
   ggtitle("(b) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1033,7 +1036,7 @@ sum <- shrub.sum %>%
          # Find y-axis: observed - predictions 
          pred_observed =  Shrub_beta - shrub_no.int_sum) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Shrub, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_shrub, col = as.factor(mig.tend))) +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
   # this needs to be changed to abline
@@ -1049,7 +1052,7 @@ sum <- shrub.sum %>%
        subtitle = "Summer") +
   ggtitle("(c) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1072,7 +1075,7 @@ fall <- shrub.fall %>%
          # Find y-axis: observed - predictions 
          pred_observed = Shrub_beta - shrub_no.int_fall) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Shrub, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_shrub, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -1089,7 +1092,7 @@ fall <- shrub.fall %>%
        subtitle = "Fall") +
   ggtitle("(d) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-0.5, 0.5),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1127,27 +1130,27 @@ Tree.fall <- sub.dat %>%
   filter(is.Fall == 1)
 
 # Calculate fit line
-Tree_fit <- line(model = Tree.mod.full, variable = "scaled_log_Tree")
+Tree_fit <- line(model = Tree.mod.full, variable = "m_SC_tree")
 
 # Winter
-Tree_no.int_wint <- my_predict(model = Tree.mod.full, data = Tree.wint, ranef = TRUE, 
+Tree_no.int_wint <- my_predict(model = Tree.mod.full, data = Tree.wint, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "scaled_log_Tree", 
+                               target_predictor = "m_SC_tree", 
                                target_intercept = c("is.Winter"))
 # Spring
-Tree_no.int_spr <- my_predict(model = Tree.mod.full, data = Tree.spr, ranef = TRUE, 
+Tree_no.int_spr <- my_predict(model = Tree.mod.full, data = Tree.spr, ranef = F, 
                               partial_resid = TRUE, intercept = TRUE, 
-                              target_predictor = "scaled_log_Tree", 
+                              target_predictor = "m_SC_tree", 
                               target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
-Tree_no.int_sum<- my_predict(model = Tree.mod.full, data = Tree.sum, ranef = TRUE, 
+Tree_no.int_sum<- my_predict(model = Tree.mod.full, data = Tree.sum, ranef = F, 
                              partial_resid = TRUE, intercept = TRUE, 
-                             target_predictor = "scaled_log_Tree", 
+                             target_predictor = "m_SC_tree", 
                              target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-Tree_no.int_fall <- my_predict(model = Tree.mod.full, data = Tree.fall, ranef = TRUE, 
+Tree_no.int_fall <- my_predict(model = Tree.mod.full, data = Tree.fall, ranef = F, 
                                partial_resid = TRUE, intercept = TRUE, 
-                               target_predictor = "scaled_log_Tree", 
+                               target_predictor = "m_SC_tree", 
                                target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
@@ -1197,7 +1200,7 @@ wint <- Tree.wint %>%
                              sex == "F" ~ "Female",
                              sex == "U" ~ "Female")) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Tree, col = as.factor(sex_fix))) +
+  ggplot(aes(x = m_SC_tree, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -1241,7 +1244,7 @@ spr <- Tree.spr %>%
          # Find y-axis: observed - predictions 
          pred_observed =  Tree_beta - Tree_no.int_spr) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Tree, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_tree, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -1281,7 +1284,7 @@ sum <- Tree.sum %>%
          # Find y-axis: observed - predictions 
          pred_observed =  Tree_beta - Tree_no.int_sum) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Tree, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_tree, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +
@@ -1321,7 +1324,7 @@ fall <- Tree.fall %>%
          # Find y-axis: observed - predictions 
          pred_observed = Tree_beta - Tree_no.int_fall) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_log_Tree, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_tree, col = as.factor(mig.tend))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
   geom_point(aes(y = pred_observed )) +

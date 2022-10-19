@@ -39,7 +39,7 @@ all_sum$SND <- "0"
 dat <- rbind(all_fall, all_win, all_sum, all_spr)
 str(dat)
 
-## Change class = integer to factor
+## Change class = character to factor
 dat[, "year"] <- as.factor(dat[, "year"])
 dat[, "month"] <- as.factor(dat[, "month"])
 
@@ -113,12 +113,13 @@ Tree_s <- sd(avail$Tree, na.rm = T)
 #c. subtract and divide
 dat$scaled_Tree <- ((dat$Tree - Tree_m)/ Tree_s)
 
+## Not working ---
 # Set SND NA values to 0
 avail$SND[is.na(avail$SND)] <- 0
 dat$SND[is.na(dat$SND)] <- 0
 ## SND ----
 # a. find mean
-SND_m <- mean(avail$SND)
+SND_m <- mean(avail$SND, na.rm = T)
 # b. find sd
 SND_s <- sd(avail$SND)
 #c. subtract and divide
@@ -130,13 +131,13 @@ saveRDS(dat, "Data/Processed/RSF_data/20221018_3rd-order_RSF-prep.rds")
 
 # Create data frame
 models_means <- data.frame(mean = c(Elev_m,  Rough_m,  Herb_m, bio_m,
-                                    Shrub_m,  Tree_m,  SND_m, a.sin_m, a.cos_m),
+                                    Shrub_m,  Tree_m, a.sin_m, a.cos_m),
                            sd = c(Elev_s,  Rough_s,  Herb_s, bio_s,
-                                  Shrub_s,  Tree_s,  SND_s, a.sin_s, a.cos_s))
+                                  Shrub_s,  Tree_s, a.sin_s, a.cos_s))
 
 # transpose df for calling columns later
 mod_fin <- data.frame(t(models_means))
 names(mod_fin) <- c("Elev", "Rough", "Herb", "RAP_bio",
-                    "Shrub", "Tree","SND", "Asp_sin", "Asp_cos")
+                    "Shrub", "Tree", "Asp_sin", "Asp_cos")
 
 write.csv(mod_fin, "Data/Processed/RSF_data/20221018_mean-sd-preRSF.csv", row.names = F)
