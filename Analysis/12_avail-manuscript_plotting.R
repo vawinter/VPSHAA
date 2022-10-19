@@ -35,8 +35,9 @@ library(lme4)
 library(MASS)
 library(lmerTest)
 
-# Source MEM script and pred function
+# Source MEM script 
 source("Analysis/11_MEM-full.R")
+# Run script '999_RBH-partial_resid.R' for prep fun
 
 # create a directory for the plots
 dir <- "Figures_and_Results/TWS/"
