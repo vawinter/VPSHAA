@@ -210,10 +210,10 @@ summary(Asp_cos.mod.full <- lmer(Asp_cos_beta ~ 0 +
 models <- list(Elev.mod.full, Rough.mod.full, Herb.mod.full, Shrub.mod.full,
                Tree.mod.full, Asp_sin.mod.full, Asp_cos.mod.full)
 
-names(models) <- c("elevation", "roughness", "herbaceous", "shrub",
-                   "tree", "asp_sin", "asp_cos")
+names(models) <- c("Elev.mod.full", "Rough.mod.full", "Herb.mod.full", "Shrub.mod.full",
+                   "Tree.mod.full", "Asp_sin.mod.full", "Asp_cos.mod.full")
 
 saveRDS(models, "Data/Outputs/MEM_outputs/20221019_model_outputs.rds")
 
 # Save in winter et al also
-#saveRDS(models, "../Winter_etal_map/20221019_model_outputs.rds")
+saveRDS(models, "../Winter_etal_map/20221019_model_outputs.rds")
