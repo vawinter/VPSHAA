@@ -223,7 +223,7 @@ wint <- elev.wint %>%
        y = "Elevation",
        x = "PDSI (scaled & centered)") +
   ggtitle("February") +
-  ylim(c(-0.75, 0.75)) +
+  ylim(c(-20, 20)) +
   #xlim(c(-2, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5),
@@ -259,7 +259,7 @@ spr <- elev.spr %>%
        y = "Elevation",
        x = "PDSI (scaled & centered)") +
   ggtitle("April") +
-  ylim(c(-0.75, 0.75)) +
+  ylim(c(-20, 20)) +
  # xlim(c(-2, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) 
@@ -293,7 +293,7 @@ sum <- elev.sum %>%
        y = "Elevation",
        x = "PDSI (scaled & centered)") +
   ggtitle("July") +
-  ylim(c(-0.75, 0.75)) +
+  ylim(c(-20, 20)) +
  # xlim(c(-2, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
@@ -327,7 +327,7 @@ fall <- elev.fall %>%
       y = "Elevation",
        x = "PDSI (scaled & centered)") +
   ggtitle("November") +
-  ylim(c(-0.75, 0.75)) +
+  ylim(c(-20, 20)) +
   xlim(c(-2, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))#+

@@ -476,9 +476,9 @@ wint <- rough.wint %>%
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
   labs(col = "", fill = "", 
        y = "Selection Strength",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Winter") +
-  ggtitle("(a) Roughness") +
+  ggtitle("(e) Roughness") +
   coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2))+
   theme(text = element_text(size = 15))  +
   theme_bw() +
@@ -516,9 +516,9 @@ spr <- rough.spr %>%
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   labs(col = "", fill = "", 
        y = "",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Spring") +
-  ggtitle("(b) Roughness") +
+  ggtitle("(f) Roughness") +
   coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
@@ -554,9 +554,9 @@ sum <- rough.sum %>%
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   labs(col = "", fill = "", 
        y = "Selection Strength",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Summer") +
-  ggtitle("(c) Roughness") +
+  ggtitle("(g) Roughness") +
   coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
@@ -593,9 +593,9 @@ fall <- rough.fall %>%
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   labs(col = "", fill = "", 
        y = "",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Fall") +
-  ggtitle("(d) Roughness") +
+  ggtitle("(h) Roughness") +
   coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
@@ -969,10 +969,10 @@ wint <- shrub.wint %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Winter") +
-  ggtitle("(a) Shrub") +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
+  ggtitle("(e) Shrub") +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -1009,11 +1009,11 @@ spr <- shrub.spr %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
        y = "",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Spring") +
-  ggtitle("(b) Shrub") +
+  ggtitle("(f) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1048,11 +1048,11 @@ sum <- shrub.sum %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Summer") +
-  ggtitle("(c) Shrub") +
+  ggtitle("(g) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1088,11 +1088,11 @@ fall <- shrub.fall %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "", #size = "Weighted",
        y = "",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Fall") +
-  ggtitle("(d) Shrub") +
+  ggtitle("(h) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1216,11 +1216,11 @@ wint <- Tree.wint %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
        y = "Selection Strength",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Winter") +
-  ggtitle("(a) Tree") +
+  ggtitle("(i) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1257,11 +1257,11 @@ spr <- Tree.spr %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
        y = "",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Spring") +
-  ggtitle("(b) Tree") +
+  ggtitle("(j) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1297,11 +1297,11 @@ sum <- Tree.sum %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "", #size = "Weighted",
        y = "Selection Strength",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Summer") +
-  ggtitle("(c) Tree") +
+  ggtitle("(k) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1337,11 +1337,11 @@ fall <- Tree.fall %>%
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
        y = "",
-       x = "log(Availability)",
+       x = "Availability",
        subtitle = "Fall") +
-  ggtitle("(d) Tree") +
+  ggtitle("(l) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-2, 2),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1378,27 +1378,27 @@ Asp_sin.fall <- sub.dat %>%
   filter(is.Fall == 1)
 
 # Calculate fit line
-Asp_sin_fit <- line(model = Asp_sin.mod.full, variable = "scaled_Asp_sin")
+Asp_sin_fit <- line(model = Asp_sin.mod.full, variable = "m_SC_a.sin")
 
 # Winter
-Asp_sin_no.int_wint <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.wint, ranef = TRUE, 
+Asp_sin_no.int_wint <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.wint, ranef = F, 
                                   partial_resid = TRUE, intercept = TRUE, 
-                                  target_predictor = "scaled_Asp_sin", 
+                                  target_predictor = "m_SC_a.sin", 
                                   target_intercept = c("is.Winter"))
 # Spring
-Asp_sin_no.int_spr <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.spr, ranef = TRUE, 
+Asp_sin_no.int_spr <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.spr, ranef = F, 
                                  partial_resid = TRUE, intercept = TRUE, 
-                                 target_predictor = "scaled_Asp_sin", 
+                                 target_predictor = "m_SC_a.sin", 
                                  target_intercept = c("is.Spring", "I(is.Spring * is.res)"))
 # Summer
-Asp_sin_no.int_sum<- my_predict(model = Asp_sin.mod.full, data = Asp_sin.sum, ranef = TRUE, 
+Asp_sin_no.int_sum<- my_predict(model = Asp_sin.mod.full, data = Asp_sin.sum, ranef = F, 
                                 partial_resid = TRUE, intercept = TRUE, 
-                                target_predictor = "scaled_Asp_sin", 
+                                target_predictor = "m_SC_a.sin", 
                                 target_intercept = c("is.Summer", "I(is.Summer * is.res)"))
 # Fall
-Asp_sin_no.int_fall <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.fall, ranef = TRUE, 
+Asp_sin_no.int_fall <- my_predict(model = Asp_sin.mod.full, data = Asp_sin.fall, ranef = F, 
                                   partial_resid = TRUE, intercept = TRUE, 
-                                  target_predictor = "scaled_Asp_sin", 
+                                  target_predictor = "m_SC_a.sin", 
                                   target_intercept = c("is.Fall", "I(is.Fall * is.res)"))
 
 # abline
@@ -1459,7 +1459,7 @@ wint <- Asp_sin.wint %>%
        y = "Eastness",
        x = "log(Availability)") +
   ggtitle("Winter") +
-  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1494,7 +1494,7 @@ spr <- Asp_sin.spr%>%
        y = "Eastness",
        x = "log(Availability)") +
   ggtitle("Spring") +
-  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1528,7 +1528,7 @@ sum <- Asp_sin.sum %>%
        y = "Eastness",
        x = "log(Availability)") +
   ggtitle("Summer") +
-  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1563,7 +1563,7 @@ fall <- Asp_sin.fall %>%
        y = "Eastness",
        x = "log(Availability)") +
   ggtitle("Fall") +
-  coord_cartesian(ylim = c(-9, 9),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
