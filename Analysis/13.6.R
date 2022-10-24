@@ -7,7 +7,7 @@ gc()
 library(dplyr)
 
 # Finding and fixing NA's
-dat <- read.csv( "Data/Outputs/RSF_outputs/20221018-10.5.csv", header = T)
+dat <- read.csv("Data/Outputs/2021_pred/20221024_2021-10.5.csv", header = T)
 
 # JOINING ----
 # join with fin table

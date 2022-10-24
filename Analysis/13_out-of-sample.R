@@ -19,7 +19,7 @@ options(scipen = 999)
 m_sd <- read.csv("Data/Processed/Mean_sd/20221019_mean-sd_all.csv", header = T)
 
 # Load in data
-pred_dat <- read.csv("../RSF_data/final_outputs/20220714_2021-mod_final_fix.csv", header = T)
+pred_dat <- read.csv("Data/Outputs/2021_pred/20221024_2021-10.6.csv", header = T)
 pred_dat <- pred_dat[(pred_dat$used_in + pred_dat$used_out) > 70,]
 
 # Scale and center
@@ -38,9 +38,9 @@ pred_dat$scaled_PDSI <- ((pred_dat$m_PDSI - pdsi_m)/ pdsi_s)
 pred_dat$m_road_no_0 <- pred_dat$m_road
 pred_dat$m_road_no_0[pred_dat$m_road == 0] <- min(pred_dat$m_road[pred_dat$m_road > 0])
 # a. find mean
-road_m <- m_sd$scaled_log_Road[1]
+road_m <- m_sd$log_Road[1]
 # b. find sd
-road_s <-m_sd$scaled_log_Road[2]
+road_s <-m_sd$log_Road[2]
 #c. subtract and divide
 pred_dat$scaled_log_Road <- ((log(pred_dat$m_road_no_0) - road_m)/ road_s)
 
@@ -48,22 +48,22 @@ pred_dat$scaled_log_Road <- ((log(pred_dat$m_road_no_0) - road_m)/ road_s)
 # need to multiply by SE for this 
 pred_dat$Intercept_beta_scale <- 0
 
-## scaled_log Elevation ----
-pred_dat$Elev_log <- log(pred_dat$m_elev)
-# a. find mean
-Elev_m <- m_sd$scaled_log_Elev[1]
-# b. find sd
-Elev_s <- m_sd$scaled_log_Elev[2]
-#c. subtract and divide
-pred_dat$scaled_log_Elev <- ((pred_dat$Elev_log - Elev_m)/ Elev_s)
+# ## scaled_log Elevation ----
+# pred_dat$Elev_log <- log(pred_dat$m_elev)
+# # a. find mean
+# Elev_m <- m_sd$scaled_log_Elev[1]
+# # b. find sd
+# Elev_s <- m_sd$scaled_log_Elev[2]
+# #c. subtract and divide
+# pred_dat$scaled_log_Elev <- ((pred_dat$Elev_log - Elev_m)/ Elev_s)
 
 ## SND ----
 pred_dat$m_snd_no_0 <- pred_dat$m_snd
 pred_dat$m_snd_no_0[pred_dat$m_snd == 0] <- min(pred_dat$m_snd[pred_dat$m_snd > 0]) 
 # a. find mean
-SND_m <- m_sd$scaled_log_SND[1]
+SND_m <- m_sd$log_SND[1]
 # b. find sd
-SND_s <- m_sd$scaled_log_SND[2]
+SND_s <- m_sd$log_SND[2]
 #c. subtract and divide
 pred_dat$scaled_log_SND <- ((log(pred_dat$m_snd_no_0) - SND_m)/ SND_s)
 
@@ -129,7 +129,8 @@ Tree_s <-  m_sd$scaled_log_Tree[2]
 pred_dat$scaled_log_Tree <- ((pred_dat$Tree_log  - Tree_m)/ Tree_s)
 
 ############################################################################################
-
+# create df for the MAE outputs
+mae <- data.frame()
 # Elevation:
 pred_dat$Elev.mod.prediction.full <- predict(Elev.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Elev.mod.prediction.null <- predict(Elev.mod.null, newdata = pred_dat, re.form = NA)
@@ -139,7 +140,7 @@ plot(y = pred_dat$Elev_beta, x = pred_dat$Elev.mod.prediction.full,
      main = "Elevation")
 points(pred_dat$Elev_beta, pred_dat$Elev.mod.prediction.null, col = "blue")
 abline(0,1, col = "red")
-tiff()
+tiff("Figures_and_Results/TWS/predictions/Elevation.tif")
 
 
 observed.weights <- pred_dat$Elev_stder ^ -2
@@ -159,9 +160,13 @@ MAE.null <- sum((abs(pred_dat$Elev_beta - pred_dat$Elev.mod.prediction.null)) *
 pred_dat$Rough.mod.prediction.full <- predict(Rough.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Rough.mod.prediction.null <- predict(Rough.mod.null, newdata = pred_dat, re.form = NA)
 
-plot(pred_dat$Rough_beta, pred_dat$Rough.mod.prediction.full)
-points(pred_dat$Rough_beta, pred_dat$Rough.mod.prediction.null, col = "red")
-abline(0,1)
+plot(pred_dat$Rough_beta, pred_dat$Rough.mod.prediction.full,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     main = "Roughness")
+points(pred_dat$Rough_beta, pred_dat$Rough.mod.prediction.null, col = "blue")
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Rough.tif")
+dev.off()
 
 observed.weights <- pred_dat$Rough_stder ^ -2
 MSE.full <- sum(((pred_dat$Rough_beta - pred_dat$Rough.mod.prediction.full) ^ 2) *
@@ -185,6 +190,8 @@ plot(y = pred_dat$Herb_beta, x = pred_dat$Herb.mod.prediction.full,
      main = "Herbaceous cover")
 points(pred_dat$Herb_beta, pred_dat$Herb.mod.prediction.null, col = "blue")
 abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Herb.tif")
+dev.off()
 
 observed.weights <- pred_dat$Herb_stder ^ -2
 MSE.full <- sum(((pred_dat$Herb_beta - pred_dat$Herb.mod.prediction.full) ^ 2) *
@@ -203,9 +210,14 @@ MAE.null <- sum((abs(pred_dat$Herb_beta - pred_dat$Herb.mod.prediction.null)) *
 pred_dat$Shrub.mod.prediction.full <- predict(Shrub.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Shrub.mod.prediction.null <- predict(Shrub.mod.null, newdata = pred_dat, re.form = NA)
 
-plot(pred_dat$Shrub_beta, pred_dat$Shrub.mod.prediction.full)
-points(pred_dat$Shrub_beta, pred_dat$Shrub.mod.prediction.null, col = "red")
-abline(0,1)
+plot(pred_dat$Shrub_beta, pred_dat$Shrub.mod.prediction.full,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     main = "Shrub")
+points(pred_dat$Shrub_beta, pred_dat$Shrub.mod.prediction.null, col = "blue")
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Shrub.tif")
+dev.off()
+
 
 observed.weights <- pred_dat$Shrub_stder ^ -2
 MSE.full <- sum(((pred_dat$Shrub_beta - pred_dat$Shrub.mod.prediction.full) ^ 2) *
@@ -224,9 +236,13 @@ MAE.null <- sum((abs(pred_dat$Shrub_beta - pred_dat$Shrub.mod.prediction.null)) 
 pred_dat$Tree.mod.prediction.full <- predict(Tree.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Tree.mod.prediction.null <- predict(Tree.mod.null, newdata = pred_dat, re.form = NA)
 
-plot(pred_dat$Tree_beta, pred_dat$Tree.mod.prediction.full)
-points(pred_dat$Tree_beta, pred_dat$Tree.mod.prediction.null, col = "red")
-abline(0,1)
+plot(pred_dat$Tree_beta, pred_dat$Tree.mod.prediction.full,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     main = "Shrub")
+points(pred_dat$Tree_beta, pred_dat$Tree.mod.prediction.null, col = "blue")
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Tree.tif")
+dev.off()
 
 observed.weights <- pred_dat$Tree_stder ^ -2
 MSE.full <- sum(((pred_dat$Tree_beta - pred_dat$Tree.mod.prediction.full) ^ 2) *

@@ -4,7 +4,7 @@
 ##------------- November 2021 -----------X
 ##--- Last edited: October 10, 2022 -----X
 #########################################X
-##------- Last ran: May 24, 2022 --------X
+##------- Last ran: oct 20, 2022 --------X
 #########################################X
 
 # Based on code Space Use Ecology: from 06_HSA_pt2.
@@ -23,6 +23,8 @@
 rm(list = ls())
 gc()
 
+source("Analysis/99_funs.R")
+
 # Load packages ----
 library(tidyverse)
 library(lubridate)
@@ -33,28 +35,21 @@ library(sf)
 library(tidyr)
 #library(parallel)
 
-## Load data ---- # new edit 2/10/2022
+## Load data ---- 
 ### Load in landscape covariates ----
-#dir <- "../Covar_org/"
-dir <- "../../../../Box/Projects/buffer/Covar_org/"
+dir <- "../../../../Box/Projects/buffer/Covar_org/2021_covar/"
 
 # List covariate files
-landscapes <- list.files(dir, full.names = T)[!list.files(dir) %in% c("landscape_201801.tif",
-                                                       "landscape_201901.tif",
-                                                       "landscape_202001.tif",
-                                                       "202102_model_data.rds",
-                                                       "202104_model_data.rds",
-                                                       "202107_model_data.rds",
-                                                       "202111_model_data.rds",
-                                                       "2021_covar")]
-
-
+landscapes <- list.files(dir, full.names = T)[list.files(dir) %in% c("landscape_202102.tif",
+                                                                     "landscape_202104.tif",
+                                                                     "landscape_202107.tif",
+                                                                     "landscape_202111.tif")]
 # Input into data frame
 dates <- data.frame(filename = landscapes,
                     # find year in name
-                    year = substr(stringr::word(landscapes, 3, 3, "_"), start = 1, stop = 4),
+                    year = substr(stringr::word(landscapes, 4, 4, "_"), start = 1, stop = 4),
                     # find month in name
-                    month = substr(stringr::word(landscapes, 3, 3, "_"), start = 5, stop = 6)) %>% 
+                    month = substr(stringr::word(landscapes, 4, 4, "_"), start = 5, stop = 6)) %>% 
   # create leap column for leap year
   mutate(leap = case_when(year == 2020 ~ TRUE,
                           TRUE ~ FALSE),
@@ -200,8 +195,8 @@ for (l in landscapes) {
   # Save ----
   # BJS comment: I would end this script here. Save mod_dat as your "final"
   # model data, and fit RSFs in the next script
-  ym <- stringr::word(stringr::word(l, 3, 3, "_"), 1, 1, "\\.")
-  saveRDS(mod_dat, paste0("Data/Processed/RSF_data/", ym, "_model_data.rds"))
+  ym <- stringr::word(stringr::word(l, 4, 4, "_"), 1, 1, "\\.")
+  saveRDS(mod_dat, paste0("Data/Processed/2021_RSF_data/", ym, "_model_data.rds"))
     
 }
 
@@ -210,3 +205,97 @@ x <- readRDS("../RSF_data/202004_model_data.rds")
 head(x)
 
 # DONE!
+
+# Sclae and center ----
+# Load in data
+m_sd <- read.csv("Data/Processed/Mean_sd/20221019_mean-sd_all.csv", header = T)
+
+# Load in data
+# Load in data
+dir <- "Data/Processed/2021_RSF_data/"
+# Read in 2021 data
+files <- list.files(dir, full.names = T)
+
+# merge into one file
+# File lengths are different. Loading them in by season to investigate why
+sum <- readRDS(files[3])
+all_other <- do.call(rbind, lapply(files[c(1,2,4)], readRDS)) 
+
+# Snow!
+sum$SND <- "0"
+
+# merge
+pred_dat <- rbind(all_other, sum)
+str(pred_dat)
+
+# Scale and center
+# Set SND NA values to 0
+pred_dat$SND[is.na(pred_dat$SND)] <- 0
+
+## scaled_log Elevation ----
+# a. find mean
+Elev_m <- m_sd$Elev[1]
+# b. find sd
+Elev_s <- m_sd$Elev[2]
+#c. subtract and divide
+pred_dat$scaled_Elev <- ((pred_dat$Elevation - Elev_m)/ Elev_s)
+
+## Aspect(sin) ----
+# a. find mean
+a.sin_m <- m_sd$Asp_sin[1]
+# b. find sd
+a.sin_s <-  m_sd$Asp_sin[2]
+#c. subtract and divide
+pred_dat$scaled_Asp_sin <- ((pred_dat$Asp_sin - a.sin_m)/ a.sin_s)
+
+## Aspect(cos) ----
+# a. find mean
+a.cos_m <- m_sd$Asp_cos[1]
+# b. find sd
+a.cos_s <-  m_sd$Asp_cos[2]
+#c. subtract and divide
+pred_dat$scaled_Asp_cos <- ((pred_dat$Asp_cos - a.cos_m)/ a.cos_s)
+
+## Roughness ----
+# a. find mean
+Rough_m <- m_sd$Rough[1]
+# b. find sd
+Rough_s <- m_sd$Rough[2]
+#c. subtract and divide
+pred_dat$scaled_Rough <- ((pred_dat$Roughness - Rough_m)/ Rough_s)
+
+## RAP (bio) ----
+# a. find mean
+bio_m <- m_sd$RAP_bio[1]
+# b. find sd
+bio_s <- m_sd$RAP_bio[2]
+#c. subtract and divide
+pred_dat$scaled_RAP_bio <- ((pred_dat$RAP_bio - bio_m)/ bio_s)
+
+## RAP (cover) ----
+# a. find mean
+herb_m <- m_sd$Herb[1]
+# b. find sd
+herb_s <- m_sd$Herb[2]
+#c. subtract and divide
+pred_dat$scaled_Herb <- ((pred_dat$Herb - herb_m)/ herb_s)
+
+## Shrub ----
+# a. find mean
+  Shrub_m <-  m_sd$Shrub[1]
+# b. find sd
+Shrub_s <- m_sd$Shrub[2]
+#c. subtract and divide
+pred_dat$scaled_Shrub <- ((pred_dat$Shrub - Shrub_m)/ Shrub_s)
+
+## Tree ----
+# a. find mean
+Tree_m <-  m_sd$Tree[1]
+# b. find sd
+Tree_s <-  m_sd$Tree[2]
+#c. subtract and divide
+pred_dat$scaled_Tree <- ((pred_dat$Tree  - Tree_m)/ Tree_s)
+
+
+# Save output ----
+saveRDS(pred_dat, "Data/Processed/2021_RSF_data/20221024_2021_3rd-order_RSF-prep.rds")

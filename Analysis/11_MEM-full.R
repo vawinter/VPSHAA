@@ -50,6 +50,17 @@ summary(Elev.mod.full <- lmer(Elev_beta ~ 0 + Intercept_beta_scale +
                                 I(is.Fall * scaled_PDSI) +
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Elev, data = dat, REML = T))
+summary(Elev.mod.null <- lmer(Elev_beta ~ 0 + #Intercept_beta_scale + 
+                                # Winter
+                                is.Winter + 
+                                # Spring
+                                is.Spring + 
+                                # Summer
+                                is.Summer + 
+                                # Fall
+                                is.Fall + 
+                                (1 | unit:year) + (1 | ID),
+                              weights = weight_Elev, data = dat, REML = T))
 
 # ... Roughness ----
 dat$Elev.mod.prediction.full <- scale(predict(Elev.mod.full, re.form = NA)) 
@@ -71,6 +82,17 @@ summary(Rough.mod.full <- lmer(Rough_beta ~ 0 +
                                  # Fall
                                  is.Fall + 
                                  I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
+                                 (1 | unit:year) + (1 | ID),
+                               weights = weight_Rough, data = dat, REML = T))
+summary(Rough.mod.null <- lmer(Rough_beta ~ 0 +
+                                 # Winter
+                                 is.Winter + 
+                                 # Spring
+                                 is.Spring + 
+                                 # Summer
+                                 is.Summer + 
+                                 # Fall
+                                 is.Fall + 
                                  (1 | unit:year) + (1 | ID),
                                weights = weight_Rough, data = dat, REML = T))
 
@@ -97,6 +119,18 @@ summary(Herb.mod.full <- lmer(Herb_beta ~ 0 +
                                 I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Herb, data = dat, REML = T))
+summary(Herb.mod.null <- lmer(Herb_beta ~ 0 +
+                                # Winter
+                                is.Winter + 
+                                # Spring
+                                is.Spring + 
+                                # Summer
+                                is.Summer + 
+                                # Fall
+                                is.Fall + 
+                                (1 | unit:year) + (1 | ID),
+                              weights = weight_Herb, data = dat, REML = T))
+
 
 # ... Shrub ----
 dat$Herb.mod.prediction.full <- scale(predict(Herb.mod.full, re.form = NA)) 
@@ -120,6 +154,17 @@ summary(Shrub.mod.full <- lmer(Shrub_beta ~ 0 +
                                  # Fall
                                  is.Fall + 
                                  I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
+                                 (1 | unit:year) + (1 | ID),
+                               weights = weight_Shrub, data = dat, REML = T))
+summary(Shrub.mod.null <- lmer(Shrub_beta ~ 0 +
+                                 # Winter
+                                 is.Winter + 
+                                 # Spring
+                                 is.Spring + 
+                                 # Summer
+                                 is.Summer + 
+                                 # Fall
+                                 is.Fall + 
                                  (1 | unit:year) + (1 | ID),
                                weights = weight_Shrub, data = dat, REML = T))
 
@@ -146,6 +191,17 @@ summary(Tree.mod.full <- lmer(Tree_beta ~ 0 +
                                 # Fall
                                 is.Fall + 
                                 I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
+                                (1 | unit:year) + (1 | ID),
+                              weights = weight_Tree, data = dat, REML = T))
+summary(Tree.mod.null <- lmer(Tree_beta ~ 0 +
+                                # Winter
+                                is.Winter + 
+                                # Spring
+                                is.Spring + 
+                                # Summer
+                                is.Summer + 
+                                # Fall
+                                is.Fall + 
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Tree, data = dat, REML = T))
 
@@ -175,6 +231,17 @@ summary(Asp_sin.mod.full <- lmer(Asp_sin_beta ~ 0 +
                                    I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
                                    (1 | unit:year) + (1 | ID),
                                  weights = weight_Asp_sin, data = dat, REML = T))
+summary(Asp_sin.mod.null <- lmer(Asp_sin_beta ~ 0 +
+                                   ## Winter
+                                   is.Winter + 
+                                   # Spring
+                                   is.Spring + 
+                                   # Summer
+                                   is.Summer + 
+                                   # Fall
+                                   is.Fall + 
+                                   (1 | unit:year) + (1 | ID),
+                                 weights = weight_Asp_sin, data = dat, REML = T))
 
 # ... ASP cos ----
 dat$Asp_sin.mod.prediction.full <- scale(predict(Asp_sin.mod.full, re.form = NA)) 
@@ -201,6 +268,17 @@ summary(Asp_cos.mod.full <- lmer(Asp_cos_beta ~ 0 +
                                    # Fall
                                    is.Fall + 
                                    I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
+                                   (1 | unit:year) + (1 | ID),
+                                 weights = weight_Asp_cos, data = dat, REML = T))
+summary(Asp_cos.mod.null <- lmer(Asp_cos_beta ~ 0 +
+                                   # Winter
+                                   is.Winter + 
+                                   # Spring
+                                   is.Spring + 
+                                   # Summer
+                                   is.Summer + 
+                                   # Fall
+                                   is.Fall + 
                                    (1 | unit:year) + (1 | ID),
                                  weights = weight_Asp_cos, data = dat, REML = T))
 
