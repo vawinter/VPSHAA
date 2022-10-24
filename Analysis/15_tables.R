@@ -103,14 +103,14 @@ writeClipboard(mig_tab)
 # table 4 goodness of fit ----
 table4 <- data.frame("Covariates" = c("Elevation", "Roughness","Aspect (Easting)", "Aspect (Northing)",
                                       "Herbaceous cover", "Shrub cover", "Tree cover"),
-                     "R² (marginal)" = rep(NA),
-                     "R² (conditional)" = NA,
+                     "R² (marginal)" = c("-0.17", "-0.02", "0.09", "0.13", "-0.06", "0.05", "0.14"),
+                     "R² (conditional)" = c("0.16", "0.34", "0.43", "0.28", "0.44", "0.29", "0.30"),
                      check.names = FALSE) %>% 
   knitr::kable(booktabs = T,
                escape = F,
                caption = "Goodness of fit: Conditional and Marginal R² 
                values for each covariate model output.",
-               format = "latex",
+               format = "html",
                align = c("lrccccccccc")) %>% 
   #column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
  # collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%
@@ -125,9 +125,9 @@ table5 <- data.frame("Obsereved vs Predicted
                      Selection Coefficients" = 
                        c("Elevation", "Roughness","Aspect (Easting)", "Aspect (Northing)",
                                       "Herbaceous cover", "Shrub cover", "Tree cover"),
-                     "MAE FUll" = rep(NA),
-                     "MAE Null" = NA,
-                     "Pseudo R²" = NA,
+                     "MAE Full" = c("3.61", "0.57", "0.89", "0.98","0.86", "0.48", "1.70"),
+                     "MAE Null" = c("3.08", "0.43", "0.30", "0.28","0.67", "0.46", "1.15"),
+                     "Pseudo R²" = c("-0.17", "-0.31", "-1.97", "-2.50","-0.28", "-0.41", "-0.48"),
                      check.names = FALSE) %>% 
   knitr::kable(booktabs = T,
                escape = F,
@@ -138,7 +138,8 @@ table5 <- data.frame("Obsereved vs Predicted
                of the full covariate model was better than the null covariate 
                model. Negative values indicate that the null covariate model 
                had better predictive performance than the full covariate model.",
-               format = "latex",
+             #  format = "latex",
+             format = "html",
                align = c("lrccccccccc")) %>% 
   #column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
   # collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%
