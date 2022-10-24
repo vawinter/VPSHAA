@@ -15,12 +15,12 @@ table1 <- data.frame("Covariates" = c("Elevation", "Roughness","Aspect (Easting)
                      "Expected effect" = c(rep("avoidance", 3), rep("selection", 3), rep("avoidance", 1)),
                      "References" = NA,
                        
-                       # c("(Beale and Smith 1970, O’Gara et al. 2004, Zeller et al. 2021)",
-                       #                "(Beale and Smith 1970, O’Gara et al. 2004)",
-                       #                rep("(Guisan et al. 1999, Maggini et al. 2002, Hirzel and Le Lay 2008)",2),
-                       #                "(Aikens et al. 2017, 2020b)",
-                       #                "(Beale and Smith 1970a, O’Gara et al. 2004, Berger 2004)",
-                       #                "(O’Gara et al. 2004, Larsen et al. 2011)"),
+                       c("(Beale and Smith 1970, O’Gara et al. 2004, Zeller et al. 2021)",
+                                      "(Beale and Smith 1970, O’Gara et al. 2004)",
+                                      rep("(Guisan et al. 1999, Maggini et al. 2002, Hirzel and Le Lay 2008)",2),
+                                      "(Aikens et al. 2017, 2020b)",
+                                      "(Beale and Smith 1970a, O’Gara et al. 2004, Berger 2004)",
+                                      "(O’Gara et al. 2004, Larsen et al. 2011)"),
                      check.names = FALSE) %>% 
   knitr::kable(booktabs = T,
                escape = F,
@@ -38,11 +38,11 @@ writeClipboard(table1)
 
 # Table 2: references for other supporting variables ----
 table2 <- data.frame("Variables" = c("Mean Elevation", "Mean Roughness","Mean Easting", "Mean Northing",
+                                     "Mean Road Density",
                                       "Mean Herbaceous Cover", "Mean Shrub Cover", "Mean Tree Cover",
-                                      "Mean Road Density", "Mean Snow Depth", "Mean Herbaceous Biomass",
+                                      "Mean Snow Depth", "Mean Herbaceous Biomass",
                                       "Mean Palmer Drought Severity Index"),
-                     "Temporally Static/Dynamic" = c(rep("static", 4), rep("dynamic", 3),"static",
-                                                     rep("dynamic", 3)),
+                     "Temporally Static/Dynamic" = c(rep("static", 5), rep("dynamic", 6)),
                      "References" = NA,
                      
                      # c("(Beale and Smith 1970, O’Gara et al. 2004, Zeller et al. 2021)",
