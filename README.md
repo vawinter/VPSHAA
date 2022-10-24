@@ -17,9 +17,9 @@ File structure:
 -- '10.5' & '10.6': restructuring data for MEM
 -- '10.7' & '10.8': organizing PDSI and road data
 -'11_': Mixed effects model (MEM) files
--- '11_MEM_full': full model runs
--- '11_MEM_null': null models
+-- '11_MEM_full': full and null model runs
 -'12_': plotting MEM outputs
--'13_': mapping
+-'13_': Predictions for 2021 data
 -'14_rsf_': 2nd order RSF for UT
+-'15_': table creation for manuscript/presentations
 -'999_': testing and editing
