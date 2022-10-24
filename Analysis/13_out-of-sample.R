@@ -141,7 +141,7 @@ plot(y = pred_dat$Elev_beta, x = pred_dat$Elev.mod.prediction.full,
 points(pred_dat$Elev_beta, pred_dat$Elev.mod.prediction.null, col = "blue")
 abline(0,1, col = "red")
 tiff("Figures_and_Results/TWS/predictions/Elevation.tif")
-
+dev.off()
 
 observed.weights <- pred_dat$Elev_stder ^ -2
 MSE.full <- sum(((pred_dat$Elev_beta - pred_dat$Elev.mod.prediction.full) ^ 2) *
@@ -238,7 +238,7 @@ pred_dat$Tree.mod.prediction.null <- predict(Tree.mod.null, newdata = pred_dat, 
 
 plot(pred_dat$Tree_beta, pred_dat$Tree.mod.prediction.full,
      ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
-     main = "Shrub")
+     main = "Tree")
 points(pred_dat$Tree_beta, pred_dat$Tree.mod.prediction.null, col = "blue")
 abline(0,1, col = "red")
 tiff("Figures_and_Results/TWS/predictions/Tree.tif")
@@ -261,9 +261,14 @@ MAE.null <- sum((abs(pred_dat$Tree_beta - pred_dat$Tree.mod.prediction.null)) *
 pred_dat$Asp_sin.mod.prediction.full <- predict(Asp_sin.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Asp_sin.mod.prediction.null <- predict(Asp_sin.mod.null, newdata = pred_dat, re.form = NA)
 
-plot(pred_dat$Asp_sin_beta, pred_dat$Asp_sin.mod.prediction.full)
-points(pred_dat$Asp_sin_beta, pred_dat$Asp_sin.mod.prediction.null, col = "red")
-abline(0,1)
+plot(pred_dat$Asp_sin_beta, pred_dat$Asp_sin.mod.prediction.full,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     main = "Easting")
+points(pred_dat$Asp_sin_beta, pred_dat$Asp_sin.mod.prediction.null, col = "blue")
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Easting.tif")
+dev.off()
+
 
 observed.weights <- pred_dat$Asp_sin_stder ^ -2
 MSE.full <- sum(((pred_dat$Asp_sin_beta - pred_dat$Asp_sin.mod.prediction.full) ^ 2) *
@@ -282,9 +287,13 @@ MAE.null <- sum((abs(pred_dat$Asp_sin_beta - pred_dat$Asp_sin.mod.prediction.nul
 pred_dat$Asp_cos.mod.prediction.full <- predict(Asp_cos.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Asp_cos.mod.prediction.null <- predict(Asp_cos.mod.null, newdata = pred_dat, re.form = NA)
 
-plot(pred_dat$Asp_cos_beta, pred_dat$Asp_cos.mod.prediction.full)
-points(pred_dat$Asp_cos_beta, pred_dat$Asp_cos.mod.prediction.null, col = "red")
-abline(0,1)
+plot(pred_dat$Asp_cos_beta, pred_dat$Asp_cos.mod.prediction.full,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     main = "Northing")
+points(pred_dat$Asp_cos_beta, pred_dat$Asp_cos.mod.prediction.null, col = "blue")
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Northing.tif")
+
 
 observed.weights <- pred_dat$Asp_cos_stder ^ -2
 MSE.full <- sum(((pred_dat$Asp_cos_beta - pred_dat$Asp_cos.mod.prediction.full) ^ 2) *
