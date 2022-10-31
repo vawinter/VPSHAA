@@ -232,7 +232,7 @@ wint <- elev.wint %>%
        x = "Availablilty",
        subtitle = "Winter") +
   ggtitle("(a) Elevation") +
-  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   theme(#plot.title = element_text(hjust = 0.5),
@@ -273,7 +273,7 @@ spr <- elev.spr %>%
        subtitle = "Spring") +
   ggtitle("(b) Elevation") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -312,7 +312,7 @@ sum <- elev.sum %>%
        x = "Availablilty",
        subtitle = "Summer") +
   ggtitle("(c) Elevation") +
-  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -352,7 +352,7 @@ fall <- elev.fall %>%
        x = "Availablilty",
        subtitle = "Fall") +
   ggtitle("(d) Elevation") +
-  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -479,7 +479,7 @@ wint <- rough.wint %>%
        x = "Availability",
        subtitle = "Winter") +
   ggtitle("(e) Roughness") +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2))+
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2))+
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -519,7 +519,7 @@ spr <- rough.spr %>%
        x = "Availability",
        subtitle = "Spring") +
   ggtitle("(f) Roughness") +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -557,7 +557,7 @@ sum <- rough.sum %>%
        x = "Availability",
        subtitle = "Summer") +
   ggtitle("(g) Roughness") +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -596,7 +596,7 @@ fall <- rough.fall %>%
        x = "Availability",
        subtitle = "Fall") +
   ggtitle("(h) Roughness") +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -724,7 +724,7 @@ wint <- herb.wint %>%
        x = "Availability",
        subtitle = "Winter") +
   ggtitle("(a) Herbaceous") +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -765,7 +765,7 @@ spr <- herb.spr %>%
        x = "Availability",
        subtitle = "Spring") +
   ggtitle("(b) Herbaceous") +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -805,7 +805,7 @@ sum <- herb.sum %>%
        x = "Availability",
        subtitle = "Summer") +
   ggtitle("(c) Herbaceous") +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -845,7 +845,7 @@ fall <- herb.fall %>%
        x = "Availability",
        subtitle = "Fall") +
   ggtitle("(d) Herbaceous") +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -972,7 +972,7 @@ wint <- shrub.wint %>%
        x = "Availability",
        subtitle = "Winter") +
   ggtitle("(e) Shrub") +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -1013,7 +1013,7 @@ spr <- shrub.spr %>%
        subtitle = "Spring") +
   ggtitle("(f) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1052,7 +1052,7 @@ sum <- shrub.sum %>%
        subtitle = "Summer") +
   ggtitle("(g) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1092,7 +1092,7 @@ fall <- shrub.fall %>%
        subtitle = "Fall") +
   ggtitle("(h) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-4, 4),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1220,7 +1220,7 @@ wint <- Tree.wint %>%
        subtitle = "Winter") +
   ggtitle("(i) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1261,7 +1261,7 @@ spr <- Tree.spr %>%
        subtitle = "Spring") +
   ggtitle("(j) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1301,7 +1301,7 @@ sum <- Tree.sum %>%
        subtitle = "Summer") +
   ggtitle("(k) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1341,7 +1341,7 @@ fall <- Tree.fall %>%
        subtitle = "Fall") +
   ggtitle("(l) Tree") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-4, 4)) +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 

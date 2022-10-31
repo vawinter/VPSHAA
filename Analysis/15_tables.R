@@ -27,7 +27,7 @@ table1 <- data.frame("Covariates" = c("Elevation", "Roughness","Aspect (Easting)
                caption = "Fine-scale habitat covaraites thought to be important 
                to pronghorn ecology and hence used as eHSF predictors (steps 4).
                All Covariates were measured at 30m resolution.",
-               format = "latex",
+               format = "html",
                align = c("lrccccccccc")) %>% 
   column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
   collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%
@@ -57,7 +57,7 @@ table2 <- data.frame("Variables" = c("Mean Elevation", "Mean Roughness","Mean Ea
                caption = "Coarse-scale habitat covariates expected to influence 
                the selection for the seven fine-scale covariates listed in 'Environmental
                Covaraites'",
-               format = "latex",
+               format = "html",
                align = c("lrccccccccc")) %>% 
   column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
   collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%
@@ -103,14 +103,14 @@ writeClipboard(mig_tab)
 # table 4 goodness of fit ----
 table4 <- data.frame("Covariates" = c("Elevation", "Roughness","Aspect (Easting)", "Aspect (Northing)",
                                       "Herbaceous cover", "Shrub cover", "Tree cover"),
-                     "R² (marginal)" = c("-0.17", "-0.02", "0.09", "0.13", "-0.06", "0.05", "0.14"),
-                     "R² (conditional)" = c("0.16", "0.34", "0.43", "0.28", "0.44", "0.29", "0.30"),
+                     "R² (marginal)" = c("57", "43", "21", "57", "23", "57", "25"),
+                     "R² (conditional)" = c("99", "99", "99", "99", "99", "99", "99"),
                      check.names = FALSE) %>% 
   knitr::kable(booktabs = T,
                escape = F,
-               caption = "Goodness of fit: Conditional and Marginal R² 
-               values for each covariate model output.",
-               format = "html",
+               caption = "Goodness of fit: Marginal and conditional R² 
+               percentage values for each covariate model output.",
+               format = "latex",
                align = c("lrccccccccc")) %>% 
   #column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
  # collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%

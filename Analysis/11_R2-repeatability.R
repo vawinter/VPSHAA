@@ -10,11 +10,11 @@ library(lmerTest)
 source("Analysis/11_MEM-full.R")
 
 # Define model
-lmer.model <- Asp_cos.mod.full
+lmer.model <- Herb.mod.full
 # Get fixed effects
-lmer.response  <- dat$Asp_cos_beta
+lmer.response  <- dat$Herb_beta
 # get weights
-lmer.weights <- dat$weight_Asp_cos
+lmer.weights <- 1
 
 ## calculate conditional R^2
 weighted.mean.response <- sum(lmer.response * lmer.weights) / sum(lmer.weights)
@@ -48,3 +48,13 @@ individual.repeatability <- (weighted.variance.residuals.fixed - weighted.varian
 # 
 # upperCI <-  days_coef + 1.96*days_se
 # lowerCI <-  days_coef  - 1.96*days_se
+
+# Calculating with nakagawain R2
+r.squaredGLMM(Elev.mod.full)
+r.squaredGLMM(Rough.mod.full)
+r.squaredGLMM(Herb.mod.full)
+r.squaredGLMM(Shrub.mod.full)
+r.squaredGLMM(Tree.mod.full)
+r.squaredGLMM(Asp_sin.mod.full)
+r.squaredGLMM(Asp_cos.mod.full)
+
