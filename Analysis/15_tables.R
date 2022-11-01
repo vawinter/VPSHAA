@@ -103,7 +103,7 @@ writeClipboard(mig_tab)
 # table 4 goodness of fit ----
 table4 <- data.frame("Covariates" = c("Elevation", "Roughness","Aspect (Easting)", "Aspect (Northing)",
                                       "Herbaceous cover", "Shrub cover", "Tree cover"),
-                     "R² (marginal)" = c("57", "43", "21", "57", "23", "57", "25"),
+                     "R² (marginal)" = c("57", "44", "21", "53", "23", "58", "30"),
                      "R² (conditional)" = c("99", "99", "99", "99", "99", "99", "99"),
                      check.names = FALSE) %>% 
   knitr::kable(booktabs = T,
