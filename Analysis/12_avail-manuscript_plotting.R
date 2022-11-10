@@ -41,7 +41,7 @@ source("Analysis/11_MEM-full.R")
 
 # create a directory for the plots
 dir <- "Figures_and_Results/TWS/"
-plot_dir <- paste0(dir, "partial_residuals/Availability/")
+plot_dir <- paste0(dir, "partial_residuals/Availability2/")
 if(!dir.exists(plot_dir)){dir.create(plot_dir, recursive = T)}
 
 # Line fun ----
@@ -232,7 +232,7 @@ wint <- elev.wint %>%
        x = "Availablilty",
        subtitle = "Winter") +
   ggtitle("(a) Elevation") +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   theme(#plot.title = element_text(hjust = 0.5),
@@ -273,7 +273,7 @@ spr <- elev.spr %>%
        subtitle = "Spring") +
   ggtitle("(b) Elevation") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -312,7 +312,7 @@ sum <- elev.sum %>%
        x = "Availablilty",
        subtitle = "Summer") +
   ggtitle("(c) Elevation") +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -352,7 +352,7 @@ fall <- elev.fall %>%
        x = "Availablilty",
        subtitle = "Fall") +
   ggtitle("(d) Elevation") +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
@@ -361,7 +361,7 @@ fall <- elev.fall %>%
 
 # Arrange plots ----
 all.elev <- grid.arrange(wint, spr, sum, fall)
-
+dev.off()
 # # save output graph
 ggsave("elev_part_resid.png", all.elev, path = plot_dir,
        width = 6, height = 4,
@@ -605,7 +605,7 @@ fall <- rough.fall %>%
 
 # Arrange plots
 all.rough <- grid.arrange(wint, spr, sum, fall)
-
+dev.off()
 # save output graph
 ggsave("rough_part_resid.png", all.rough, path = plot_dir,
        width = 6, height = 4, unit = "in")
@@ -854,7 +854,7 @@ fall <- herb.fall %>%
 
 # Arrange plots
 all.herb <- grid.arrange(wint, spr, sum, fall)
-
+dev.off()
 #save output graph
 ggsave("herb_part_resid.png", all.herb, path = plot_dir,
        width = 6, height = 4, unit = "in")
@@ -972,7 +972,7 @@ wint <- shrub.wint %>%
        x = "Availability",
        subtitle = "Winter") +
   ggtitle("(e) Shrub") +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme(text = element_text(size = 15))  +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
@@ -1013,7 +1013,7 @@ spr <- shrub.spr %>%
        subtitle = "Spring") +
   ggtitle("(f) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1052,7 +1052,7 @@ sum <- shrub.sum %>%
        subtitle = "Summer") +
   ggtitle("(g) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme_bw() +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
@@ -1092,7 +1092,7 @@ fall <- shrub.fall %>%
        subtitle = "Fall") +
   ggtitle("(h) Shrub") +
   theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
   theme_bw() +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 

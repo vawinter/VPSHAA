@@ -156,7 +156,7 @@ plot(x = pred_dat$Elev.mod.prediction.full.m, y = pred_dat$Elev_beta,
 points(x = pred_dat$Elev.mod.prediction.null.m, y = pred_dat$Elev_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Elevation.tif")
+tiff("Figures_and_Results/TWS/predictions/Elevation.tif")
 dev.off()
 
 
@@ -183,26 +183,145 @@ plot(x = pred_dat$Rough.mod.prediction.full.m, y = pred_dat$Rough_beta,
      ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
      xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
      main = "Roughness")
-points(x = pred_dat$Elev.mod.prediction.null.m, y = pred_dat$Elev_beta, col = "blue", 
+points(x = pred_dat$Rough.mod.prediction.null.m, y = pred_dat$Rough_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Rough.tif")
+tiff("Figures_and_Results/TWS/predictions/Rough.tif")
 dev.off()
 
-.
-.
-.
-.
-.
-.
-.
-.
-.
+# Herbaceous
+pred_dat$Rough.mod.prediction.full.m.scl <- scale(pred_dat$Rough.mod.prediction.full.m)
+
+pred_dat$Herb.mod.prediction.full.m <- predict(Herb.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Herb.mod.prediction.null.m <- predict(Herb.mod.null, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Herb_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Herb_beta,
+                         pred_dat$Herb.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Herb_beta,
+                         pred_dat$Herb.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+plot(x = pred_dat$Herb.mod.prediction.full.m, y = pred_dat$Herb_beta,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
+     main = "Herbaceous")
+points(x = pred_dat$Herb.mod.prediction.null.m, y = pred_dat$Herb_beta, col = "blue", 
+       pch = 19, cex = 100 * observed.weights)
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Herb.tif")
+dev.off()
+
+# Shrub
+pred_dat$Herb.mod.prediction.full.m.scl <- scale(pred_dat$Herb.mod.prediction.full.m)
+
+pred_dat$Shrub.mod.prediction.full.m <- predict(Shrub.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Shrub.mod.prediction.null.m <- predict(Shrub.mod.null, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Shrub_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Shrub_beta,
+                         pred_dat$Shrub.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Shrub_beta,
+                         pred_dat$Shrub.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+plot(x = pred_dat$Shrub.mod.prediction.full.m, y = pred_dat$Shrub_beta,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
+     main = "Shrub")
+points(x = pred_dat$Shrub.mod.prediction.null.m, y = pred_dat$Shrub_beta, col = "blue", 
+       pch = 19, cex = 100 * observed.weights)
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Shrub.tif")
+dev.off()
+
+# Tree
+pred_dat$Shrub.mod.prediction.full.m.scl <- scale(pred_dat$Shrub.mod.prediction.full.m)
+
+pred_dat$Tree.mod.prediction.full.m <- predict(Tree.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Tree.mod.prediction.null.m <- predict(Tree.mod.null, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Tree_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Tree_beta,
+                         pred_dat$Tree.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Tree_beta,
+                         pred_dat$Tree.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+plot(x = pred_dat$Tree.mod.prediction.full.m, y = pred_dat$Tree_beta,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
+     main = "Tree")
+points(x = pred_dat$Tree.mod.prediction.null.m, y = pred_dat$Tree_beta, col = "blue", 
+       pch = 19, cex = 100 * observed.weights)
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Tree.tif")
+dev.off()
+
+# Aspect - sin
+pred_dat$Tree.mod.prediction.full.m.scl <- scale(pred_dat$Tree.mod.prediction.full.m)
+
+pred_dat$Asp_sin.mod.prediction.full.m <- predict(Asp_sin.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Asp_sin.mod.prediction.null.m <- predict(Asp_sin.mod.null, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Asp_sin_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Asp_sin_beta,
+                         pred_dat$Asp_sin.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Asp_sin_beta,
+                         pred_dat$Asp_sin.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+plot(x = pred_dat$Tree.mod.prediction.full.m, y = pred_dat$Tree_beta,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
+     main = "Tree")
+points(x = pred_dat$Tree.mod.prediction.null.m, y = pred_dat$Tree_beta, col = "blue", 
+       pch = 19, cex = 100 * observed.weights)
+abline(0,1, col = "red")
+tiff("Figures_and_Results/TWS/predictions/Tree.tif")
+dev.off()
 
 
+# Aspect - cos
+pred_dat$Asp_sin.mod.prediction.full.m.scl <- scale(pred_dat$Asp_sin.mod.prediction.full.m)
 
+pred_dat$Asp_cos.mod.prediction.full.m <- predict(Asp_cos.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Asp_cos.mod.prediction.null.m <- predict(Asp_cos.mod.null, newdata = pred_dat, re.form = NA)
 
+temp <- 1 / (pred_dat$Asp_cos_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
 
-
-
+cor.full <- weightedCorr(pred_dat$Asp_cos_beta,
+                         pred_dat$Asp_cos.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Asp_cos_beta,
+                         pred_dat$Asp_cos.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
 

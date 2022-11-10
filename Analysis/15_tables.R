@@ -125,21 +125,21 @@ table5 <- data.frame("Obsereved vs Predicted
                      Selection Coefficients" = 
                        c("Elevation", "Roughness","Aspect (Easting)", "Aspect (Northing)",
                                       "Herbaceous cover", "Shrub cover", "Tree cover"),
-                     "MAE Full" = c("3.61", "0.57", "0.89", "0.98","0.86", "0.48", "1.70"),
-                     "MAE Null" = c("3.08", "0.43", "0.30", "0.28","0.67", "0.46", "1.15"),
-                     "Pseudo R²" = c("-0.17", "-0.31", "-1.97", "-2.50","-0.28", "-0.41", "-0.48"),
+                     "Full" = c("0.088", "0.229", "0.116", "0.400","0.011", "0.327", "0.330"),
+                     "Null" = c("-0.103", "0.003", "0.043", "0.360","-0.045", "0.332", "0.293"),
+                     "Pseudo R²" = c("0.095", "0.113", "0.036", "0.020", "0.011", "-0.002", "0.0187"),
                      check.names = FALSE) %>% 
   knitr::kable(booktabs = T,
                escape = F,
-               caption = "Out of sample validation: Mean Absolute Error 
-               (MAE) when applied to out-of-sample data for predictions of 
-               full vs null model, and the difference between the two. 
+               caption = "Out of sample validation: Pearson's weighted coorelation estimations 
+               applied to out-of-sample data for estimating predictive capacity for 
+               full vs null models, and the full models pseudo-R² values. 
                Positive pseudo-R² values indicate the predictive performance 
                of the full covariate model was better than the null covariate 
                model. Negative values indicate that the null covariate model 
                had better predictive performance than the full covariate model.",
              #  format = "latex",
-             format = "html",
+             format = "latex",
                align = c("lrccccccccc")) %>% 
   #column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
   # collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%
