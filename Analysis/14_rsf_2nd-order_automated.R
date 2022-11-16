@@ -7,7 +7,6 @@
 rm(list = ls())
 gc()
 
-
 # libraries
 library(tidyverse)
 library(lubridate)
@@ -15,21 +14,31 @@ library(raster)
 library(rnaturalearth)
 library(sf)
 
-# Load in shape of utah
-dir <- "../../../../Box/Projects/Analysis/VAW Study map/base"
+# Function to calculate harmonic mean
+harm <- function(x, na.rm = FALSE) {
+  return(1/mean(1/x, na.rm = na.rm))
+}
+
+# Data load in ----
+## Load in ph data
+ph_dat <- readRDS("Data/Processed/comb_dat_20220524.rds")
+
+# Directories ----
+## Load in shape of utah
+dir1 <- "../../../../Box/Projects/Analysis/VAW Study map/base"
 # EPSG for CRS
 wgs <- 4326
 utm <- 32612 
-utah <- st_read(dsn = dir,
+utah <- st_read(dsn = dir1,
                 layer = "utah") %>% 
   st_transform(crs = st_crs(utm)) 
 plot(utah)
 crs(utah)
 ext <- extent(utah)
 
-# List covariate files
-dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/10x10_Covariate_stacks/2021_stacks/"
-landscapes <- list.files(dir, full.names = T)
+## List covariate files ----
+dir2 <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/10x10_Covariate_stacks/2021_stacks/"
+landscapes <- list.files(dir2, full.names = T)
 
 # seperate per seson
 winter <- stack(landscapes[1])
@@ -49,16 +58,15 @@ fall <- stack(landscapes[4])
 names(fall) <- c("elevation", "snd", "asp_sin", "asp_cos", "roughness", "bio",
                  "herb", "shrub", "tree") 
 
+# Set up loop ----
+## Make a list of seasons
+season <- c("fall", "summer", "winter", "spring")
 
-# Function to calculate harmonic mean
-harm <- function(x, na.rm = FALSE) {
-  return(1/mean(1/x, na.rm = na.rm))
-}
+## Make list of rasters
+seas_rast <- c(fall, summer, winter, spring)
+names(seas_rast) <- season
 
-# Load in ph data
-ph_dat <- readRDS("Data/Processed/comb_dat_20220524.rds")
-
-# Winter ----
+# Season centroids ----
 ## Step 1: ----
 # Centroid for each individual
 cents <- ph_dat %>% 
@@ -81,20 +89,28 @@ cents <- ph_dat %>%
             hm_x = harm(x),
             hm_y = harm(y))
 
+
+# Set up list
+season_plots <- list()
+season_habsel <- list()
+
+# Loop -----
+for(s in 1:length(season)){
+
 # Filter out apprpriate season
-cents_wint <- cents %>% 
-  filter(season == "winter")
+cents_split <- cents %>% 
+  filter(season == s)
 
 ## Step 2: ----
 # get available data
-avail <- as.data.frame(winter, xy = TRUE) %>% 
+avail <- as.data.frame(seas_rast[[s]], xy = TRUE) %>% 
   mutate(case = 0,
          cell = 1:nrow(.)) %>% 
   filter(!if_any(everything(), is.na))
 
 ## Step 3: ----
 # Get used data
-used_cells <- cellFromXY(winter, cbind(cents_wint$hm_x, cents_wint$hm_y))
+used_cells <- cellFromXY(seas_rast[[s]], cbind(cents_split$hm_x, cents_split$hm_y))
 used <- avail %>%
   filter(cell %in% used_cells) %>% 
   mutate(case = 1) %>% 
@@ -110,78 +126,41 @@ rsf_dat <- rbind(used, avail) %>%
   ))
 
 ## Step 5: ----
+# Format model for summer missing snd
+if(!(s == "summer")) {
+  rsf_model <- case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + roughness + bio + herb + shrub + tree
+
+  } else {
+  
+  rsf_model <- case ~ elevation + I(elevation^2) + asp_sin + asp_cos + roughness + bio + herb + shrub + tree
+}
+
 # Fit RSF
-wint_rsf <- glm(case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + roughness + bio + herb + shrub + tree,
-                data = rsf_dat, family = binomial, weights = weight)
-summary(wint_rsf)
+rsf <- glm(data = rsf_dat, formula = rsf_model, weights = weight, family = binomial)
+summary(rsf)
 
 ## Step 6: ----
 # Predict with RSF
 map <- avail
 # Linear predictor
-map$lp <- predict(wint_rsf, newdata = map, type = "link")
+map$lp <- predict(rsf, newdata = map, type = "link")
 # Exponential Habitat Selection Function
 map$ehsf <- exp(map$lp)
 # Normalize
 map$ehsf <- map$ehsf/sum(map$ehsf, na.rm = TRUE)
 
 # Plot
-ggplot(map, aes(x = x, y = y, fill = log(ehsf))) +
+season_plots[[s]] <- ggplot(map, aes(x = x, y = y, fill = log(ehsf))) +
   geom_raster() +
   geom_sf(data = utah, fill = NA, color = "red", inherit.aes = FALSE) +
   coord_sf() +
   scale_fill_viridis_c() +
   xlab(NULL) +
   ylab(NULL) +
+  ggtitle(s) +
   theme_bw()
 
-# Summer ----
-# Treating 'summer' as an example
-cents_summ <- cents %>% 
-  filter(season == "summer")
+# end loop
+}
 
-# Available data
-avail <- as.data.frame(summer, xy = TRUE) %>% 
-  mutate(case = 0,
-         cell = 1:nrow(.)) #%>% 
-# filter(!if_any(everything(), is.na))
-
-# Used data
-used_cells <- cellFromXY(summer, cbind(cents$hm_x, cents$hm_y))
-used <- avail %>%
-  filter(cell %in% used_cells) %>% 
-  mutate(case = 1)
-
-used <- avail[used_cells,] %>% 
-  mutate(case = 1)
-
-# Combine
-rsf_dat <- rbind(used, avail) %>% 
-  mutate(weight = case_when(
-    case == 0 ~ 1e5,
-    case == 1 ~ 1
-  ))
-
-# Fit RSF
-m <- glm(case ~ elevation + I(elevation^2) + asp_sin + asp_cos + roughness + herb + shrub + tree,
-         data = rsf_dat, family = binomial, weights = weight)
-summary(m)
-
-# Predict with RSF
-map <- avail
-# Linear predictor
-map$lp <- predict(m, newdata = map, type = "link")
-# Exponential Habitat Selection Function
-map$ehsf <- exp(map$lp)
-# Normalize
-map$ehsf <- map$ehsf/sum(map$ehsf, na.rm = TRUE)
-
-# Plot
-ggplot(map, aes(x = x, y = y, fill = log(ehsf))) +
-  geom_raster() +
-  geom_sf(data = utah, fill = NA, color = "red", inherit.aes = FALSE) +
-  coord_sf() +
-  scale_fill_viridis_c() +
-  xlab(NULL) +
-  ylab(NULL) +
-  theme_bw()
+# Done!
