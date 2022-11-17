@@ -135,6 +135,9 @@ ggplot(map, aes(x = x, y = y, fill = log(ehsf))) +
   ylab(NULL) +
   theme_bw()
 
+# Save plot
+map_dir <- "Figures_and_Results/2nd_order-map/"
+
 # Summer ----
 # Treating 'summer' as an example
 cents_summ <- cents %>% 
@@ -171,6 +174,117 @@ summary(m)
 map <- avail
 # Linear predictor
 map$lp <- predict(m, newdata = map, type = "link")
+# Exponential Habitat Selection Function
+map$ehsf <- exp(map$lp)
+# Normalize
+map$ehsf <- map$ehsf/sum(map$ehsf, na.rm = TRUE)
+
+# Plot
+ggplot(map, aes(x = x, y = y, fill = log(ehsf))) +
+  geom_raster() +
+  geom_sf(data = utah, fill = NA, color = "red", inherit.aes = FALSE) +
+  coord_sf() +
+  scale_fill_viridis_c() +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme_bw()
+
+
+# Fall ----
+# Filter out apprpriate season
+cents_fall <- cents %>% 
+  filter(season == "fall")
+
+## Step 2: ----
+# get available data
+avail <- as.data.frame(fall, xy = TRUE) %>% 
+  mutate(case = 0,
+         cell = 1:nrow(.)) %>% 
+  filter(!if_any(everything(), is.na))
+
+## Step 3: ----
+# Get used data
+used_cells <- cellFromXY(fall, cbind(cents_fall$hm_x, cents_fall$hm_y))
+used <- avail %>%
+  filter(cell %in% used_cells) %>% 
+  mutate(case = 1) %>% 
+  distinct()
+
+## Step 4: ----
+# Combine into one df
+rsf_dat <- rbind(used, avail) %>% 
+  # give weights to available points
+  mutate(weight = case_when(
+    case == 0 ~ 1e5,
+    case == 1 ~ 1
+  ))
+
+## Step 5: ----
+# Fit RSF
+fall_rsf <- glm(case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + roughness + bio + herb + shrub + tree,
+                data = rsf_dat, family = binomial, weights = weight)
+summary(fall_rsf)
+
+## Step 6: ----
+# Predict with RSF
+map <- avail
+# Linear predictor
+map$lp <- predict(fall_rsf, newdata = map, type = "link")
+# Exponential Habitat Selection Function
+map$ehsf <- exp(map$lp)
+# Normalize
+map$ehsf <- map$ehsf/sum(map$ehsf, na.rm = TRUE)
+
+# Plot
+ggplot(map, aes(x = x, y = y, fill = log(ehsf))) +
+  geom_raster() +
+  geom_sf(data = utah, fill = NA, color = "red", inherit.aes = FALSE) +
+  coord_sf() +
+  scale_fill_viridis_c() +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme_bw()
+
+# Spring ----
+# Filter out apprpriate season
+cents_spr <- cents %>% 
+  filter(season == "spring")
+
+## Step 2: ----
+# get available data
+avail <- as.data.frame(spring, xy = TRUE) %>% 
+  mutate(case = 0,
+         cell = 1:nrow(.)) %>% 
+  filter(!if_any(everything(), is.na))
+
+## Step 3: ----
+# Get used data
+used_cells <- cellFromXY(spring, cbind(cents_spr$hm_x, cents_spr$hm_y))
+used <- avail %>%
+  filter(cell %in% used_cells) %>% 
+  mutate(case = 1) %>% 
+  distinct()
+
+## Step 4: ----
+# Combine into one df
+rsf_dat <- rbind(used, avail) %>% 
+  # give weights to available points
+  mutate(weight = case_when(
+    case == 0 ~ 1e5,
+    case == 1 ~ 1
+  ))
+
+## Step 5: ----
+# Fit RSF
+spr_rsf <- glm(case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + roughness + bio + herb + shrub + tree,
+                data = rsf_dat, family = binomial, weights = weight)
+summary(spr_rsf)
+
+## Step 6: ----
+# Predict with RSF
+map <- avail
+# Linear predictor
+map$lp <- predict(spr_rsf, newdata = map, type = "link")
 # Exponential Habitat Selection Function
 map$ehsf <- exp(map$lp)
 # Normalize

@@ -60,10 +60,10 @@ names(fall) <- c("elevation", "snd", "asp_sin", "asp_cos", "roughness", "bio",
 
 # Set up loop ----
 ## Make a list of seasons
-season <- c("fall", "summer", "winter", "spring")
+season <- c("fall", "winter", "spring")
 
 ## Make list of rasters
-seas_rast <- c(fall, summer, winter, spring)
+seas_rast <- c(fall, winter, spring)
 names(seas_rast) <- season
 
 # Season centroids ----
@@ -96,10 +96,22 @@ season_habsel <- list()
 
 # Loop -----
 for(s in 1:length(season)){
-
-# Filter out apprpriate season
+  
+# Filter out appropriate season
 cents_split <- cents %>% 
   filter(season == s)
+
+# # Format model for summer missing snd
+# if(!(seas == 2)) {
+#   rsf_model <- case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + 
+#     roughness + bio + herb + shrub + tree
+#   
+# } else {
+#   
+#   rsf_model <- case ~ elevation + I(elevation^2) + asp_sin + asp_cos + 
+#     roughness + bio + herb + shrub + tree
+# }
+
 
 ## Step 2: ----
 # get available data
@@ -126,17 +138,9 @@ rsf_dat <- rbind(used, avail) %>%
   ))
 
 ## Step 5: ----
-# Format model for summer missing snd
-if(!(s == "summer")) {
-  rsf_model <- case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + roughness + bio + herb + shrub + tree
-
-  } else {
-  
-  rsf_model <- case ~ elevation + I(elevation^2) + asp_sin + asp_cos + roughness + bio + herb + shrub + tree
-}
-
 # Fit RSF
-rsf <- glm(data = rsf_dat, formula = rsf_model, weights = weight, family = binomial)
+rsf <- glm(data = rsf_dat, formula = case ~ elevation + I(elevation^2) + snd + asp_sin + asp_cos + 
+           roughness + bio + herb + shrub + tree, weights = weight, family = binomial)
 summary(rsf)
 
 ## Step 6: ----
