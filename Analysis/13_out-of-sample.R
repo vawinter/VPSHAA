@@ -156,7 +156,7 @@ plot(x = pred_dat$Elev.mod.prediction.full.m, y = pred_dat$Elev_beta,
 points(x = pred_dat$Elev.mod.prediction.null.m, y = pred_dat$Elev_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Figures_and_Results/TWS/predictions/Elevation.tif")
+tiff("Figures_and_Results/Manuscript/Elevation.tif")
 dev.off()
 
 
@@ -186,7 +186,7 @@ plot(x = pred_dat$Rough.mod.prediction.full.m, y = pred_dat$Rough_beta,
 points(x = pred_dat$Rough.mod.prediction.null.m, y = pred_dat$Rough_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Figures_and_Results/TWS/predictions/Rough.tif")
+tiff("Figures_and_Results/Manuscript/Rough.tif")
 dev.off()
 
 # Herbaceous
@@ -215,7 +215,7 @@ plot(x = pred_dat$Herb.mod.prediction.full.m, y = pred_dat$Herb_beta,
 points(x = pred_dat$Herb.mod.prediction.null.m, y = pred_dat$Herb_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Figures_and_Results/TWS/predictions/Herb.tif")
+tiff("Figures_and_Results/Manuscript/Herb.tif")
 dev.off()
 
 # Shrub
@@ -244,7 +244,7 @@ plot(x = pred_dat$Shrub.mod.prediction.full.m, y = pred_dat$Shrub_beta,
 points(x = pred_dat$Shrub.mod.prediction.null.m, y = pred_dat$Shrub_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Figures_and_Results/TWS/predictions/Shrub.tif")
+tiff("Figures_and_Results/Manuscript/Shrub.tif")
 dev.off()
 
 # Tree
@@ -273,7 +273,7 @@ plot(x = pred_dat$Tree.mod.prediction.full.m, y = pred_dat$Tree_beta,
 points(x = pred_dat$Tree.mod.prediction.null.m, y = pred_dat$Tree_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Figures_and_Results/TWS/predictions/Tree.tif")
+tiff("Figures_and_Results/Manuscript/Tree.tif")
 dev.off()
 
 # Aspect - sin
@@ -295,14 +295,14 @@ cor.null <- weightedCorr(pred_dat$Asp_sin_beta,
                          weights = observed.weights)
 (cor.full - cor.null) / 2
 
-plot(x = pred_dat$Tree.mod.prediction.full.m, y = pred_dat$Tree_beta,
+plot(x = pred_dat$Asp_sin.mod.prediction.full.m, y = pred_dat$Asp_sin_beta,
      ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
      xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
-     main = "Tree")
-points(x = pred_dat$Tree.mod.prediction.null.m, y = pred_dat$Tree_beta, col = "blue", 
+     main = "Easting")
+points(x = pred_dat$Asp_sin.mod.prediction.null.m, y = pred_dat$Asp_sin_beta, col = "blue", 
        pch = 19, cex = 100 * observed.weights)
 abline(0,1, col = "red")
-tiff("Figures_and_Results/TWS/predictions/Tree.tif")
+tiff("Figures_and_Results/Manuscript/Easting.tif")
 dev.off()
 
 
@@ -325,3 +325,12 @@ cor.null <- weightedCorr(pred_dat$Asp_cos_beta,
                          weights = observed.weights)
 (cor.full - cor.null) / 2
 
+plot(x = pred_dat$Asp_cos.mod.prediction.full.m, y = pred_dat$Asp_cos_beta,
+     ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
+     xlim = c(-1, 2), ylim = c(-40, 40), pch = 19, cex = 100 * observed.weights,
+     main = "Northing")
+points(x = pred_dat$Asp_cos.mod.prediction.null.m, y = pred_dat$Asp_cos_beta, col = "blue", 
+       pch = 19, cex = 100 * observed.weights)
+abline(0,1, col = "red")
+tiff("Figures_and_Results/Manuscript/Northing.tif")
+dev.off()

@@ -25,15 +25,9 @@ ph_dat <- readRDS("Data/Processed/comb_dat_20220524.rds")
 
 # Directories ----
 ## Load in shape of utah
-dir1 <- "../../../../Box/Projects/Analysis/VAW Study map/base"
-# EPSG for CRS
-wgs <- 4326
-utm <- 32612 
-utah <- st_read(dsn = dir1,
-                layer = "utah") %>% 
-  st_transform(crs = st_crs(utm)) 
-plot(utah)
-crs(utah)
+# Utah
+utah <- st_read("geo/utah.shp") %>%
+  st_transform(32612)
 ext <- extent(utah)
 
 ## List covariate files ----
@@ -160,16 +154,23 @@ for(s in 1:length(season)){
     xlab(NULL) +
     ylab(NULL) +
     ggtitle(season[s]) +
-    theme_bw()
+    theme_bw() +
+    theme(text = element_text(size = 12, color = "black"),
+          axis.text.x = element_text(size = 11, color = "black", angle = -90),
+          axis.text.y = element_text(size = 12, color = "black"),
+          legend.text = element_text(size = 12, color = "black")) 
   
   # Create filename
-  fn <- paste0(season[s], "_", ".tif")
+  fn <- paste0(season[s], ".tif")
   
   # Save plot
   ggsave(file.path("Figures_and_Results/2nd_order-map/", fn), 
          plot = season_plots[[s]],
          device = agg_tiff, width = 8, height = 10, units = "in",
          dpi = 300, compression = "lzw")
+  
+  # Save df
+  saveRDS(map, paste0("Data/Processed/2nd-order_RSF/", season[s], "_2nd-order_data.rds"))
   
   # end loop
 }

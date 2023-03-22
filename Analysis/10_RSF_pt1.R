@@ -47,7 +47,7 @@ plot(ut_rast)
 
 ## A. Load data ----
 # landscape covariates ----
-dir <- "../../../Avgar Lab on WILD/UtahEnvironmentalCovariates/"
+dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/"
 snow <- paste0(dir, "SNODAS/monthly_aggregate/202011_mean_snd.tif")
 
 #1. Aggregated snow *

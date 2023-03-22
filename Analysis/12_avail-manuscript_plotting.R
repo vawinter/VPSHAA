@@ -25,7 +25,7 @@ gc()
 
 # Libraries
 library(dplyr)
-library(gridExtra)
+library(patchwork)
 library(ggplot2)
 library(effects)
 library(tidyverse)
@@ -37,11 +37,12 @@ library(lmerTest)
 
 # Source MEM script 
 source("Analysis/11_MEM-full.R")
+source("Analysis/999_RBH-partial_resid.R")
 # Run script '999_RBH-partial_resid.R' for prep fun
 
 # create a directory for the plots
-dir <- "Figures_and_Results/TWS/"
-plot_dir <- paste0(dir, "partial_residuals/Availability2/")
+dir <- "Figures_and_Results/Manuscript/"
+plot_dir <- paste0(dir, "partial_residuals/Availability/")
 if(!dir.exists(plot_dir)){dir.create(plot_dir, recursive = T)}
 
 # Line fun ----
@@ -196,7 +197,7 @@ fall_line <- elev_fit %>%
 
 # Plot -----
 ## Winter ----
-wint <- elev.wint %>%
+wint_elev <- elev.wint %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -228,20 +229,21 @@ wint <- elev.wint %>%
   # scale_size_continuous(range = c(0.01, 1.2),
   #                         labels = ~scales::comma(x = -.x)) +
   labs(col = "", fill = "",
-       y = "Selection Strength",
-       x = "Availablilty",
-       subtitle = "Winter") +
-  ggtitle("(a) Elevation") +
+       y = "",
+       x = "") +
+       caption = "",
+  ggtitle("Elevation") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
-  theme(#plot.title = element_text(hjust = 0.5),
-    legend.position = "right") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+    text = element_text(size = 15),
+    legend.position = "top",
+    plot.caption.position = "panel") +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
  ## Spring ----
-spr <- elev.spr %>%
+spr_elev <- elev.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -268,19 +270,21 @@ spr <- elev.spr %>%
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   labs(col = "", fill = "",
-       y = "",
-       x = "Availablilty",
-       subtitle = "Spring") +
-  ggtitle("(b) Elevation") +
-  theme(text = element_text(size = 15))  +
+       x = "",
+       y = "Selection Strength",
+       caption = "") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  theme_classic() +
+  theme(#plot.title = element_text(hjust = 0.5),
+    text = element_text(size = 15),
+    legend.position = "top",
+    plot.caption.position = "plot") +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 ## Summer ----
-sum <- elev.sum %>%
+sum_elev <- elev.sum %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -308,19 +312,22 @@ sum <- elev.sum %>%
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   labs(col = "", fill = "",
-       y = "Selection Strength",
-       x = "Availablilty",
-       subtitle = "Summer") +
-  ggtitle("(c) Elevation") +
+       y = "",
+       x = "",
+       caption = "") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
+  theme_classic() +
+  theme(#plot.title = element_text(hjust = 0.5),
+    text = element_text(size = 15),
+    legend.position = "",
+    plot.caption.position = "plot") +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Fall ----
-fall <- elev.fall %>%
+fall_elev <- elev.fall %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -350,35 +357,38 @@ fall <- elev.fall %>%
   labs(col = "", fill = "", 
        y = "",
        x = "Availablilty",
-       subtitle = "Fall") +
-  ggtitle("(d) Elevation") +
+       caption = "") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(vjust=2),
+    text = element_text(size = 15),
+    legend.position = "",
+    plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots ----
-all.elev <- grid.arrange(wint, spr, sum, fall)
+all.elev <- wint_elev/ spr_elev/ sum_elev/ fall_elev
 dev.off()
 # # save output graph
-ggsave("elev_part_resid.png", all.elev, path = plot_dir,
-       width = 6, height = 4,
+ggsave("elev2.png", all.elev, path = plot_dir,
+       width = 5, height = 12,
        unit = "in")
 
-
-ggsave("elev-fall.png", fall, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("elev-wint.png", wint, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("elev-sum.png", sum, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("elev-spr.png", spr, path = plot_dir,
-       width = 6, height = 4, unit = "in")
+# 
+# ggsave("elev-fall.png", fall, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("elev-wint.png", wint, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("elev-sum.png", sum, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("elev-spr.png", spr, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
 
 # ex: Rough model -----
 # Partial residuals --------------
@@ -444,7 +454,7 @@ fall_line <- rough_fit %>%
 
 # Plot -----
 ## Winter ----
-wint <- rough.wint %>%
+wint_r <- rough.wint %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -475,20 +485,23 @@ wint <- rough.wint %>%
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
   scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
   labs(col = "", fill = "", 
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Winter") +
-  ggtitle("(e) Roughness") +
-  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2))+
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+       y = "",
+       x = "",
+       caption = "(a) Winter") +
+  ggtitle("Roughness") +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 
 ## Spring ----
-spr <- rough.spr %>%
+spr_r <- rough.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -516,17 +529,20 @@ spr <- rough.spr %>%
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   labs(col = "", fill = "", 
        y = "",
-       x = "Availability",
-       subtitle = "Spring") +
-  ggtitle("(f) Roughness") +
+       x = "",
+       caption = "(b) Spring") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  theme_classic() +
+  theme(#plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 ## Summer ----
-sum <- rough.sum %>%
+sum_r <- rough.sum %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -553,19 +569,22 @@ sum <- rough.sum %>%
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   labs(col = "", fill = "", 
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Summer") +
-  ggtitle("(g) Roughness") +
+       y = "",
+       x = "",
+       caption = "(c) Summer") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Fall ----
-fall <- rough.fall %>%
+fall_r <- rough.fall %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -593,34 +612,43 @@ fall <- rough.fall %>%
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   labs(col = "", fill = "", 
        y = "",
-       x = "Availability",
-       subtitle = "Fall") +
-  ggtitle("(h) Roughness") +
+       x = "Availablilty",
+       caption = "(d) Fall") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots
-all.rough <- grid.arrange(wint, spr, sum, fall)
+all.rough <- wint_r/spr_r/sum_r/fall_r
 dev.off()
-# save output graph
-ggsave("rough_part_resid.png", all.rough, path = plot_dir,
-       width = 6, height = 4, unit = "in")
 
-ggsave("rough_part_resid-fall.png", fall, path = plot_dir,
-       width = 6, height = 4, unit = "in")
+# # save output graph
+ggsave("rough.png", all.rough, path = plot_dir,
+       width = 5, height = 12,
+       unit = "in")
 
-ggsave("rough_part_resid-wint.png", wint, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("rough_part_resid-sum.png", sum, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("rough_part_resid-spr.png", spr, path = plot_dir,
-       width = 6, height = 4, unit = "in")
+# # save output graph
+# ggsave("rough_part_resid.png", all.rough, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("rough_part_resid-fall.png", fall, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("rough_part_resid-wint.png", wint, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("rough_part_resid-sum.png", sum, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
+# 
+# ggsave("rough_part_resid-spr.png", spr, path = plot_dir,
+#        width = 6, height = 4, unit = "in")
 
 
 
@@ -688,7 +716,7 @@ fall_line <- herb_fit %>%
 
 # Plot -----
 ## Winter ----
-wint <- herb.wint %>%
+wint_herb <- herb.wint %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -720,20 +748,23 @@ wint <- herb.wint %>%
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Winter") +
-  ggtitle("(a) Herbaceous") +
+       y = "",
+       x = "",
+       caption = "(a) Winter") +
+  ggtitle("Herbaceous") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 
 ## Spring ----
-spr <- herb.spr %>%
+spr_herb <- herb.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -760,20 +791,23 @@ spr <- herb.spr %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "", #size = "Weighted",
-       y = "",
-       x = "Availability",
-       subtitle = "Spring") +
-  ggtitle("(b) Herbaceous") +
+  labs(col = "", fill = "", 
+       y = "Selection Strength",
+       x = "",
+       caption = "(b) Spring") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
+  theme_classic() +
+  theme(#plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 ## Summer ----
-sum <- herb.sum %>%
+sum_herb <- herb.sum %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -800,20 +834,23 @@ sum <- herb.sum %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "", #size = "Weighted",
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Summer") +
-  ggtitle("(c) Herbaceous") +
+  labs(col = "", fill = "", 
+       y = "",
+       x = "",
+       caption = "(c) Summer") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  theme_classic() +
+  theme(#plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Fall ----
-fall <- herb.fall %>%
+fall_herb <- herb.fall %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -840,36 +877,28 @@ fall <- herb.fall %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "",# size = "Weighted",
+  labs(col = "", fill = "", 
        y = "",
        x = "Availability",
-       subtitle = "Fall") +
-  ggtitle("(d) Herbaceous") +
+       caption = "(d) Fall") +
+  ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots
-all.herb <- grid.arrange(wint, spr, sum, fall)
+all.herb <- wint_herb/spr_herb/sum_herb/fall_herb
 dev.off()
 #save output graph
-ggsave("herb_part_resid.png", all.herb, path = plot_dir,
-       width = 6, height = 4, unit = "in")
+ggsave("herb.png", all.herb, path = plot_dir,
+       width = 5, height = 12, unit = "in")
 
-ggsave("herb_part_resid-fall.png", fall, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("herb_part_resid-wint.png", wint, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("herb_part_resid-sum.png", sum, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("herb_part_resid-spr.png", spr, path = plot_dir,
-       width = 6, height = 4, unit = "in")
 
 # ex: Shrub model -----
 # Separate the seasons
@@ -934,7 +963,7 @@ fall_line <- shrub_fit %>%
 
 # Plot -----
 ## Winter ----
-wint <- shrub.wint %>%
+wint_shrub <- shrub.wint %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -967,20 +996,24 @@ wint <- shrub.wint %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "", #size = "Weighted",
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Winter") +
-  ggtitle("(e) Shrub") +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
-  theme(text = element_text(size = 15))  +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  labs(col = "", fill = "", 
+       y = "",
+       x = "",
+       caption = "(a) Winter") +
+  ggtitle("Shrub") +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
+
 ## Spring ----
-spr <- shrub.spr %>%
+spr_shrub <- shrub.spr %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1007,20 +1040,24 @@ spr <- shrub.spr %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "",# size = "Weighted",
-       y = "",
-       x = "Availability",
-       subtitle = "Spring") +
-  ggtitle("(f) Shrub") +
-  theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+  labs(col = "", fill = "", 
+       y = " ",
+       x = "",
+       caption = "(b) Spring") +
+  ggtitle("") +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
+
 ## Summer ----
-sum <- shrub.sum %>%
+sum_shrub <- shrub.sum %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1046,20 +1083,23 @@ sum <- shrub.sum %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "", #size = "Weighted",
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Summer") +
-  ggtitle("(g) Shrub") +
-  theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
-  theme_bw() +
+  labs(col = "", fill = "", 
+       y = " ",
+       x = "",
+       caption = "(c) Summer") +
+  ggtitle("") +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Fall ----
-fall <- shrub.fall %>%
+fall_shurb <- shrub.fall %>%
   # Bin non Movers into Movers (based on MEM)
   # Winter = not accounting for migration status
   mutate(mig.tend = case_when((.$tendency == "mig" ) & (.$month !=  "2") ~ "Mover",
@@ -1086,37 +1126,27 @@ fall <- shrub.fall %>%
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "", #size = "Weighted",
+  labs(col = "", fill = "", 
        y = "",
        x = "Availability",
-       subtitle = "Fall") +
-  ggtitle("(h) Shrub") +
-  theme(text = element_text(size = 15))  +
-  coord_cartesian(ylim = c(-5, 5),  xlim = c(-2, 2)) +
-  theme_bw() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
+       caption = "(d) Fall") +
+  ggtitle("") +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.caption.position = "plot") +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots
-all.shrub <- grid.arrange(wint, spr, sum, fall)
+all.shrub <- wint_shrub/spr_shrub/sum_shrub/fall_shurb
 dev.off()
 # save output graph
 ggsave("shrub_part_resid.png", all.shrub, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("shrub_part_resid-fall.png", fall, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("shrub_part_resid-wint.png", wint, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("shrub_part_resid-sum.png", sum, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("shrub_part_resid-spr.png", spr, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
+       width = 5, height = 12, unit = "in")
 
 # ex: Tree model -----
 # Separate the seasons
