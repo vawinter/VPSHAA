@@ -175,19 +175,19 @@ conf_df <- coef_conf(Elev.mod.full) %>%
 my_pal <- c("#fffaf7", "#fff0e5", "#ffe1ca", "#ebc8bb", "#c8b4c1", "#a0a0c8", 
             "#7b8cc4", "#3f6cb1", "#005696", "#003b64", "#002c4a")
 
-# conf_df %>%
-#   ggplot(aes(y = param_cat, col = p_value)) +
-#   geom_linerange(aes(xmin = lwr, xmax = upr)) +
-#   geom_point(aes(x = estimate)) +
-#   geom_vline(xintercept = 0, col = "grey", linetype = 2) +
-#   facet_wrap(~model, nrow = 2, ncol = 4,
-#              # labeller = data.frame(c("Elevation", "Roughness", "Herbaceous",
-#                           # "Shrub", "Tree", "Eastness", "Northness"))
-#              ) +
-#   scale_color_gradientn(colors = my_pal,
-#                         limits = c(0, 0.05)) +
-#   labs(x = "Coefficient Estimate", y = "Category", col = "p-value") 
-# ggsave("Figures_and_Results/TWS/model-dist.png", width = 6, height = 5, units = "in")
+conf_df %>%
+  ggplot(aes(y = param_cat, col = p_value)) +
+  geom_linerange(aes(xmin = lwr, xmax = upr)) +
+  geom_point(aes(x = estimate)) +
+  geom_vline(xintercept = 0, col = "grey", linetype = 2) +
+  facet_wrap(~model, nrow = 2, ncol = 4,
+             # labeller = data.frame(c("Elevation", "Roughness", "Herbaceous",
+                          # "Shrub", "Tree", "Eastness", "Northness"))
+             ) +
+  scale_color_gradientn(colors = my_pal,
+                        limits = c(0, 0.05)) +
+  labs(x = "Coefficient Estimate", y = "Category", col = "p-value")
+ggsave("Figures_and_Results/TWS/model-dist.png", width = 6, height = 5, units = "in")
 
 data_new <- conf_df                              # Replicate data
 data_new$group <- factor(conf_df$param_cat,      # Reordering group factor levels
@@ -196,11 +196,13 @@ data_new$group <- factor(conf_df$param_cat,      # Reordering group factor level
                                     "Spring-Resident", "Winter-Male"))
 data_new %>%
   ggplot(aes(y = model, col = p_value)) +
-  geom_linerange(aes(xmin = lwr, xmax = upr, size = 0.015)) +
-  geom_point(aes(x = estimate, size = 0.05)) +
+ # geom_linerange(aes(xmin = lwr, xmax = upr, size = 0.015)) +
+  geom_point(aes(x = estimate), size = 3) +
+  geom_linerange(aes(xmin = lwr, xmax = upr), size = 1) +
   geom_vline(xintercept = 0, col = "grey5", linetype = 2) +
   facet_wrap(~group, nrow = 2, ncol = 4) +
-  scale_color_gradient(low = "lightblue", high = "#00008B",
+  # scale_color_gradient(low = "lightblue", high = "#00008B",
+  scale_color_gradient(low = "lightsalmon", high = "#00008B",
                         na.value = "grey",
                         limits = c(0, 0.05)) +
   labs(x = "Coefficient Estimate", y = "Habitat Attribute", col = "p-value") +
@@ -213,5 +215,5 @@ data_new %>%
         axis.text.y = element_text(size = 12, color = "black"),
         legend.text = element_text(size = 12, color = "black")) 
 
-ggsave("Figures_and_Results/TWS/model-dist_v2.png", width = 8, height = 6, units = "in")
+ggsave("Figures_and_Results/TWS/model-dist_v3.png", width = 8, height = 6, units = "in")
 

@@ -34,6 +34,7 @@ library(MuMIn)
 library(lme4)
 library(MASS)
 library(lmerTest)
+library(gridExtra)
 
 # Source MEM script 
 source("Analysis/11_MEM-full.R")
@@ -225,13 +226,13 @@ wint_elev <- elev.wint %>%
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
-  scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
+  scale_color_manual(values = c("Female" = "darkorange", "Male" = "darkorchid3", "Range" = "chartreuse3")) +
   # scale_size_continuous(range = c(0.01, 1.2),
   #                         labels = ~scales::comma(x = -.x)) +
   labs(col = "", fill = "",
        y = "",
-       x = "") +
-       caption = "",
+       x = "" ,
+       caption = "")+
   ggtitle("Elevation") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_classic() +
@@ -269,6 +270,7 @@ spr_elev <- elev.spr %>%
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "",
        x = "",
        y = "Selection Strength",
@@ -311,6 +313,7 @@ sum_elev <- elev.sum %>%
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "",
        y = "",
        x = "",
@@ -354,6 +357,7 @@ fall_elev <- elev.fall %>%
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "", 
        y = "",
        x = "Availablilty",
@@ -743,21 +747,21 @@ wint_herb <- herb.wint %>%
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
-  scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
+  scale_color_manual(values = c("Female" = "darkorange", "Male" = "darkorchid3", "Range" = "chartreuse3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = "",
        x = "",
-       caption = "(a) Winter") +
+       subtitle = "(a) Winter") +
   ggtitle("Herbaceous") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "top",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -788,20 +792,21 @@ spr_herb <- herb.spr %>%
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = "Selection Strength",
        x = "",
-       caption = "(b) Spring") +
+       subtitle = "(b) Spring") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(#plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "top",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -831,20 +836,21 @@ sum_herb <- herb.sum %>%
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = "",
        x = "",
-       caption = "(c) Summer") +
+       subtitle = "(c) Summer") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(#plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -874,20 +880,21 @@ fall_herb <- herb.fall %>%
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = "",
        x = "Availability",
-       caption = "(d) Fall") +
+       subtitle = "(d) Fall") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -991,7 +998,7 @@ wint_shrub <- shrub.wint %>%
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
-  scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
+  scale_color_manual(values = c("Female" = "darkorange", "Male" = "darkorchid3", "Range" = "chartreuse3")) +
  # scale_color_manual(values = c("Range" = "#00BA38")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
@@ -999,14 +1006,14 @@ wint_shrub <- shrub.wint %>%
   labs(col = "", fill = "", 
        y = "",
        x = "",
-       caption = "(a) Winter") +
+       subtitle = "(a) Winter") +
   ggtitle("Shrub") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "top",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1037,20 +1044,21 @@ spr_shrub <- shrub.spr %>%
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = " ",
        x = "",
-       caption = "(b) Spring") +
+       subtitle = "(b) Spring") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "top",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1080,20 +1088,21 @@ sum_shrub <- shrub.sum %>%
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = " ",
        x = "",
-       caption = "(c) Summer") +
+       subtitle = "(c) Summer") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1123,20 +1132,21 @@ fall_shurb <- shrub.fall %>%
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "", 
        y = "",
        x = "Availability",
-       caption = "(d) Fall") +
+       subtitle = "(d) Fall") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "",
-        plot.caption.position = "plot") +
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1239,19 +1249,23 @@ wint <- Tree.wint %>%
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
-  scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
+  scale_color_manual(values = c("Female" = "darkorange", "Male" = "darkorchid3", "Range" = "chartreuse3")) +
   #scale_color_manual(values = c("Range" = "#00BA38")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Winter") +
-  ggtitle("(i) Tree") +
+       y = "",
+       x = "",
+       subtitle = "(a) Winter") +
+  ggtitle("Tree") +
   theme(text = element_text(size = 15))  +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1282,17 +1296,22 @@ spr <- Tree.spr %>%
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
-       y = "",
-       x = "Availability",
-       subtitle = "Spring") +
-  ggtitle("(j) Tree") +
+       y = "Selection Strength",
+       x = "",
+       subtitle = "(b) Spring") +
+  ggtitle("") +
   theme(text = element_text(size = 15))  +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1322,17 +1341,22 @@ sum <- Tree.sum %>%
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
-  labs(col = "", fill = "", #size = "Weighted",
-       y = "Selection Strength",
-       x = "Availability",
-       subtitle = "Summer") +
-  ggtitle("(k) Tree") +
+  labs(col = "", fill = "",# size = "Weighted",
+       y = "",
+       x = "",
+       subtitle = "(c) Summer") +
+  ggtitle("") +
   theme(text = element_text(size = 15))  +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -1362,39 +1386,32 @@ fall <- Tree.fall %>%
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
+  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   # scale_size_continuous(range = c(0.01, 1.2), 
   #                       labels = ~scales::comma(x = -.x),
   #                       name = "Weighted") +
   labs(col = "", fill = "",# size = "Weighted",
        y = "",
        x = "Availability",
-       subtitle = "Fall") +
-  ggtitle("(l) Tree") +
+       subtitle = "(d) Fall") +
+  ggtitle("") +
   theme(text = element_text(size = 15))  +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme_bw() +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.subtitle = element_text(hjust = 1)) +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots
-all.Tree <- grid.arrange(wint, spr, sum, fall)
+all.Tree <- wint/ spr/ sum/ fall
 dev.off()
 # save output graph
-ggsave("Tree_part_resid-seas.png", all.Tree, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("Tree_part_resid-spr.png", spr, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("Tree_part_resid-fall.png", fall, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("Tree_part_resid-sum.png", sum, path = plot_dir,
-       width = 6, height = 4, unit = "in")
-
-ggsave("Tree_part_resid-win.png", wint, path = plot_dir,
-       width = 6, height = 4, unit = "in")
+ggsave("tree_part_resid.png", all.Tree, path = plot_dir,
+       width = 5, height = 12, unit = "in")
 
 # ex: Aspect (sin) -----
 # Separate the seasons
@@ -1473,25 +1490,34 @@ wint <- Asp_sin.wint %>%
                               (.$tendency == "NA") & (.$month == "2") ~ "Range",
                               (is.na(.$tendency)) & (.$month == "2") ~ "Range"),
          # Find y-axis: observed - predictions 
-         pred_observed = Asp_sin_beta - Asp_sin_no.int_wint) %>%
+         pred_observed = Asp_sin_beta - Asp_sin_no.int_wint,
+         sex_fix = case_when(sex == "M" ~ "Male",
+                             sex == "F" ~ "Female",
+                             sex == "U" ~ "Female")) %>%
   # Plot against avail
-  ggplot(aes(x = scaled_Asp_sin, col = as.factor(mig.tend))) +
+  ggplot(aes(x = m_SC_a.sin, col = as.factor(sex_fix))) +
   # geom_hline(yintercept = 0, linetype = 2, col = "grey") +
   # add in predictions
-  geom_point(aes(y = pred_observed), col = "#00BA38") +
+  geom_point(aes(y = pred_observed )) +
   # scale_alpha(range = c(0.002, 0.008)) +
   # this needs to be changed to abline
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
-  scale_color_manual(values = c("Range" = "#00BA38")) +
-  labs(col = "", fill = "", 
-       y = "Eastness",
-       x = "log(Availability)") +
-  ggtitle("Winter") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
+  labs(col = "", fill = "",# size = "Weighted",
+       y = "",
+       x = "",
+       subtitle = "(a) Winter") +
+  ggtitle("Easting") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.subtitle = element_text(hjust = 1)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
@@ -1520,13 +1546,19 @@ spr <- Asp_sin.spr%>%
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
-  labs(col = "", fill = "", 
-       y = "Eastness",
-       x = "log(Availability)") +
-  ggtitle("Spring") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(col = "", fill = "",# size = "Weighted",
+       y = " ",
+       x = "",
+       subtitle = "(b) Spring") +
+  ggtitle("") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "top",
+        plot.subtitle = element_text(hjust = 1)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 ## Summer ----
@@ -1554,13 +1586,19 @@ sum <- Asp_sin.sum %>%
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
-  labs(col = "", fill = "", 
-       y = "Eastness",
-       x = "log(Availability)") +
-  ggtitle("Summer") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(col = "", fill = "",# size = "Weighted",
+       y = "",
+       x = "",
+       subtitle = "(c) Summer") +
+  ggtitle("") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.subtitle = element_text(hjust = 1)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
@@ -1589,22 +1627,28 @@ fall <- Asp_sin.fall %>%
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
-  labs(col = "", fill = "", 
-       y = "Eastness",
-       x = "log(Availability)") +
-  ggtitle("Fall") +
-  coord_cartesian(ylim = c(-3, 3),  xlim = c(-4, 4)) +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(col = "", fill = "",# size = "Weighted",
+       y = "",
+       x = "Availability",
+       subtitle = "(d) Fall") +
+  ggtitle("") +
+  theme(text = element_text(size = 15))  +
+  coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 15),
+        legend.position = "",
+        plot.subtitle = element_text(hjust = 1)) +
+  # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
 # Arrange plots
-all.Asp_sin <- grid.arrange(wint, spr, sum, fall)
+all.Asp_sin <- wint/spr/sum/fall
 
 # save output graph
-ggsave("Asp_sin_part_resid-seas.png", all.Asp_sin, path = plot_dir,
-       width = 6, height = 4, unit = "in")
+ggsave("asp_part_resid.png", all.Asp_sin, path = plot_dir,
+       width = 5, height = 12, unit = "in")
 
 # ex: Aspect (cos) -----
 # Separate the seasons

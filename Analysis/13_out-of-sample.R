@@ -49,15 +49,6 @@ pred_dat$scaled_log_Road <- ((log(pred_dat$m_road_no_0) - road_m)/ road_s)
 # need to multiply by SE for this 
 pred_dat$Intercept_beta_scale <- 0
 
-# ## scaled_log Elevation ----
-# pred_dat$Elev_log <- log(pred_dat$m_elev)
-# # a. find mean
-# Elev_m <- m_sd$scaled_log_Elev[1]
-# # b. find sd
-# Elev_s <- m_sd$scaled_log_Elev[2]
-# #c. subtract and divide
-# pred_dat$scaled_log_Elev <- ((pred_dat$Elev_log - Elev_m)/ Elev_s)
-
 ## SND ----
 pred_dat$m_snd_no_0 <- pred_dat$m_snd
 pred_dat$m_snd_no_0[pred_dat$m_snd == 0] <- min(pred_dat$m_snd[pred_dat$m_snd > 0]) 
@@ -68,73 +59,12 @@ SND_s <- m_sd$log_SND[2]
 #c. subtract and divide
 pred_dat$scaled_log_SND <- ((log(pred_dat$m_snd_no_0) - SND_m)/ SND_s)
 
-# ## Aspect(sin) ----
-# # a. find mean
-# a.sin_m <- m_sd$Asp_sin[1]
-# # b. find sd
-# a.sin_s <-  m_sd$Asp_sin[2]
-# #c. subtract and divide
-# pred_dat$scaled_Asp_sin <- ((pred_dat$m_a.sin - a.sin_m)/ a.sin_s)
-# 
-# ## Aspect(cos) ----
-# # a. find mean
-# a.cos_m <- m_sd$Asp_cos[1]
-# # b. find sd
-# a.cos_s <-  m_sd$Asp_cos[2]
-# #c. subtract and divide
-# pred_dat$scaled_Asp_cos <- ((pred_dat$m_a.cos - a.cos_m)/ a.cos_s)
-
-# ## Roughness ----
-# pred_dat$Rough_log <- log(pred_dat$m_rough)
-# # a. find mean
-# Rough_m <- m_sd$scaled_log_Rough[1]
-# # b. find sd
-# Rough_s <- m_sd$scaled_log_Rough[2]
-# #c. subtract and divide
-# pred_dat$scaled_log_Rough <- ((pred_dat$Rough_log - Rough_m)/ Rough_s)
-
-# ## RAP (bio) ----
-# pred_dat$RAP_bio_log <- log(pred_dat$m_bio)
-# # a. find mean
-# bio_m <- m_sd$scaled_log_RAP_bio[1]
-# # b. find sd
-# bio_s <- m_sd$scaled_log_RAP_bio[2]
-# #c. subtract and divide
-# pred_dat$scaled_log_RAP_bio <- ((pred_dat$RAP_bio_log - bio_m)/ bio_s)
-
-# ## RAP (cover) ----
-# pred_dat$Shrub_log <- log(pred_dat$m_herb)
-# # a. find mean
-# herb_m <- m_sd$scaled_log_Herb[1]
-# # b. find sd
-# herb_s <- m_sd$scaled_log_Herb[2]
-# #c. subtract and divide
-# pred_dat$scaled_log_Herb <- ((pred_dat$Shrub_log - herb_m)/ herb_s)
-# 
-# ## Shrub ----
-# pred_dat$Shrub_log <- log(pred_dat$m_shrub)
-# # a. find mean
-# Shrub_m <-  m_sd$scaled_log_Shrub[1]
-# # b. find sd
-# Shrub_s <- m_sd$scaled_log_Shrub[2]
-# #c. subtract and divide
-# pred_dat$scaled_log_Shrub <- ((pred_dat$Shrub_log - Shrub_m)/ Shrub_s)
-# 
-# ## Tree ----
-# pred_dat$Tree_log <- log(pred_dat$m_tree)
-# # a. find mean
-# Tree_m <-  m_sd$scaled_log_Tree[1]
-# # b. find sd
-# Tree_s <-  m_sd$scaled_log_Tree[2]
-# #c. subtract and divide
-# pred_dat$scaled_log_Tree <- ((pred_dat$Tree_log  - Tree_m)/ Tree_s)
-# 
-############################################################################################
-
 # Elevation
 
 pred_dat$Elev.mod.prediction.full.m <- predict(Elev.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Elev.mod.prediction.null.m <- predict(Elev.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Elev.mod.prediction.seas.m <- predict(Elev.mod.seas, newdata = pred_dat, re.form = NA)
+pred_dat$Elev.mod.prediction.avail.m <- predict(Elev.mod.avail, newdata = pred_dat, re.form = NA)
 
 temp <- 1 / (pred_dat$Elev_stder ^ 2)
 observed.weights <- temp / sum(temp, na.rm = TRUE)
@@ -148,6 +78,21 @@ cor.null <- weightedCorr(pred_dat$Elev_beta,
                          method = "Pearson",
                          weights = observed.weights)
 (cor.full - cor.null) / 2
+
+
+
+cor.seas <- weightedCorr(pred_dat$Elev_beta,
+                         pred_dat$Elev.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+cor.avail <- weightedCorr(pred_dat$Elev_beta,
+                         pred_dat$Elev.mod.prediction.avail.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+(cor.full - cor.avail) / 2
 
 plot(x = pred_dat$Elev.mod.prediction.full.m, y = pred_dat$Elev_beta,
      ylab = "Observed Selection Coefficients", xlab = "Predicted Selection Coefficients",
@@ -334,3 +279,15 @@ points(x = pred_dat$Asp_cos.mod.prediction.null.m, y = pred_dat$Asp_cos_beta, co
 abline(0,1, col = "red")
 tiff("Figures_and_Results/Manuscript/Northing.tif")
 dev.off()
+
+
+
+# whats the story? avail only null model shows that compared to full we need 
+# other factors of the individual
+
+# seas model tells us we need availability
+
+# null model tells us that compared to assumed even dist our model is more transferable than nothing
+
+# overall, model transferability is important and we are showing that, for pronghorn, this is a more transferable model
+# than otherwise would've been used?
