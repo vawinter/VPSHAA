@@ -31,7 +31,7 @@ library(lubridate)
 source("99_funs.R")
 
 ### Load in landscape covariates ----
-dir <- "../Covar_org/2021_covar/"
+dir <- "../../../../Box/Projects/buffer/Covar_org/"
 
 
 # Create empty data frame to store results
@@ -42,16 +42,20 @@ output <- data.frame(ID = NA,
                      year = NA)
 
 # List covariate files
-landscapes <- list.files(dir, full.names = T)[list.files(dir) %in% c("landscape_202102.tif",
-                                                                     "landscape_202104.tif",
-                                                                     "landscape_202107.tif",
-                                                                     "landscape_202111.tif")]
+landscapes <- list.files(dir, full.names = T)[!list.files(dir) %in% c("landscape_201801.tif",
+                                                                      "landscape_201901.tif",
+                                                                      "landscape_202001.tif",
+                                                                      "202102_model_data.rds",
+                                                                      "202104_model_data.rds",
+                                                                      "202107_model_data.rds",
+                                                                      "202111_model_data.rds",
+                                                                      "2021_covar")]
 # Input into data frame
 dates <- data.frame(filename = landscapes,
                     # find year in name
-                    year = substr(stringr::word(landscapes, 4, 4, "_"), start = 1, stop = 4),
+                    year = substr(stringr::word(landscapes, 3, 3, "_"), start = 1, stop = 4),
                     # find month in name
-                    month = substr(stringr::word(landscapes, 4, 4, "_"), start = 5, stop = 6)) %>% 
+                    month = substr(stringr::word(landscapes, 3, 3, "_"), start = 5, stop = 6)) %>% 
   # create leap column for leap year
   mutate(leap = case_when(year == 2020 ~ TRUE,
                           TRUE ~ FALSE),
@@ -71,9 +75,9 @@ for (l in landscapes) {
   date_row <- dates[dates$filename == l, ]
   
   # Load and str data ----
-  #ph_dat <- readRDS("cleaned_data/comb_dat_20220524.rds")
+  ph_dat <- readRDS("Data/processed/comb_dat_20220524.rds")
   # Updated 06/20/2022 (cleaned data at 2 hr fixes)
-  ph_dat <- readRDS("cleaned_data/20220620_cleaned-data.rds")
+  #ph_dat <- readRDS("cleaned_data/20220620_cleaned-data.rds")
   
   # Filter desired date range
   ph <- ph_dat %>%

@@ -14,7 +14,7 @@
 # Pronghorn GPS data. 
 
 # Goals for this script:
-#       1. Fit GLM per indiv (using scaled and centerd variables)
+#       1. Fit GLM per indiv (using scaled and centered variables)
 #             a. see script (10_RSF-prep_pt2.1.R)
 #       2. save betas and st. error outputs for each indiv and covar
 
@@ -26,7 +26,7 @@ gc()
 library(dplyr)
 
 # Load in data ----
-RSF_dat <-  readRDS("Data/Processed/RSF_data/20221018_3rd-order_RSF-prep.rds")
+RSF_dat <-  readRDS("Data/Processed/RSF_data/20230812_3rd-order_RSF-prep.rds")
 
 # Set up loop ----
 # iterate over unique individual/month/year combinations
@@ -141,7 +141,7 @@ glm_df <- glm_df[-1236, ]
 outdir <- "Data/Outputs/RSF_outputs/"
 #dir.create(outdir)
 
-saveRDS(glm_df, paste0(outdir, "20221018_eHSF_output.rds"))
+saveRDS(glm_df, paste0(outdir, "20230812_eHSF_output.rds"))
 
 
 # Test

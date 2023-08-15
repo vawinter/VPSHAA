@@ -21,8 +21,8 @@ gc()
 library(dplyr)
 
 # Load in data
-mod <-readRDS("Data/Processed/RSF_data/20221018_3rd-order_RSF-prep.rds")
-mod$SND[is.na(mod$SND)] <- 0
+mod <-readRDS("Data/Processed/RSF_data/20230812_3rd-order_RSF-prep.rds")
+#mod$SND[is.na(mod$SND)] <- 0
 mod$SND <- as.numeric(mod$SND)
 
 # Formatting ----
@@ -127,7 +127,7 @@ table(output$month)
 table(output$year)
 
 # Save as .rds 
-saveRDS(output, "Data/Outputs/RSF_outputs/20221018_m_avail.rds")
+saveRDS(output, "Data/Outputs/RSF_outputs/20230812_m_avail.rds")
 
 #out_dir <- "../../Data/Chapter1/20220723_ouptuts/"
 #dir.create(out_dir)

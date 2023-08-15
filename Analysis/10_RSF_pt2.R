@@ -33,6 +33,8 @@ library(sf)
 library(tidyr)
 #library(parallel)
 
+source("Analysis/99_funs.R")
+
 ## Load data ---- # new edit 2/10/2022
 ### Load in landscape covariates ----
 #dir <- "../Covar_org/"
@@ -89,7 +91,8 @@ for (l in landscapes) {
   
 
   # Load and str data ----
-  ph_dat <- readRDS("Data/Processed/comb_dat_20220524.rds")
+  ph_dat <- readRDS("Data/Processed/20220813_cleaned-data.rds")
+  
   
   # Filter desired date range
   ph <- ph_dat %>%
@@ -202,11 +205,14 @@ for (l in landscapes) {
   # model data, and fit RSFs in the next script
   ym <- stringr::word(stringr::word(l, 3, 3, "_"), 1, 1, "\\.")
   saveRDS(mod_dat, paste0("Data/Processed/RSF_data/", ym, "_model_data.rds"))
+  
+  # clean up env
+  gc()
     
 }
 
 # Read in test .rds
-x <- readRDS("../RSF_data/202004_model_data.rds")
+x <- readRDS("Data/Processed/RSF_data/202004_model_data.rds")
 head(x)
 
 # DONE!
