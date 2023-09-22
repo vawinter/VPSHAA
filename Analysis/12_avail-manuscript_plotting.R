@@ -232,16 +232,14 @@ wint_elev <- elev.wint %>%
   labs(col = "", fill = "",
        y = "",
        x = "" ,
-       subtitle = "(a) Winter") +
-  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
+       caption = "")+
   ggtitle("Elevation") +
+  coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
     text = element_text(size = 15),
-    legend.position = "top") +
-  theme(text = element_text(size = 15),
-        legend.position = "",
-        plot.subtitle = element_text(hjust = 1)) +
+    legend.position = "top",
+    plot.caption.position = "panel") +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
@@ -276,14 +274,14 @@ spr_elev <- elev.spr %>%
   labs(col = "", fill = "",
        x = "",
        y = "Selection Strength",
-       subtitle = "(b) Spring") +
+       caption = "") +
   ggtitle("") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(#plot.title = element_text(hjust = 0.5),
     text = element_text(size = 15),
-    legend.position = "",
-    plot.subtitle = element_text(hjust = 1)) +
+    legend.position = "top",
+    plot.caption.position = "plot") +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
 
@@ -316,17 +314,17 @@ sum_elev <- elev.sum %>%
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
   scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
-  labs(col = "", fill = "", 
+  labs(col = "", fill = "",
        y = "",
-       x = "Availability",
-       subtitle = "(c) Summer") +
+       x = "",
+       caption = "") +
   ggtitle("") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(#plot.title = element_text(hjust = 0.5),
     text = element_text(size = 15),
     legend.position = "",
-    plot.subtitle = element_text(hjust = 1)) +
+    plot.caption.position = "plot") +
   #theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -362,15 +360,15 @@ fall_elev <- elev.fall %>%
   scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "", 
        y = "",
-       x = "Availability",
-       subtitle = "(d) Fall") +
+       x = "Availablilty",
+       caption = "") +
   ggtitle("") +
   coord_cartesian(ylim = c(-50, 50),  xlim = c(-2, 2)) +
   theme_classic() +
-  theme(plot.title = element_text(hjust = 0.5),
-        text = element_text(size = 15),
-        legend.position = "",
-        plot.subtitle = element_text(hjust = 1)) +
+  theme(plot.title = element_text(vjust=2),
+    text = element_text(size = 15),
+    legend.position = "",
+    plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -489,19 +487,18 @@ wint_r <- rough.wint %>%
   geom_line(aes(x = x, y = y, color = "Range"), data = wint_line) +
   geom_line(aes(x = x, y = lwr, color = "Range"), linetype = "dashed", data = wint_line) +
   geom_line(aes(x = x, y = upr, color = "Range"), linetype = "dashed", data = wint_line) +
-  scale_color_manual(values = c("Female" = "darkorange", "Male" = "darkorchid3", "Range" = "chartreuse3")) +
+  scale_color_manual(values = c("Female" = "#00BFC4", "Male" = "#C77CFF", "Range" = "#00BA38")) +
   labs(col = "", fill = "", 
        y = "",
        x = "",
-       subtitle = "(a) Winter") +
+       caption = "(a) Winter") +
   ggtitle("Roughness") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
-  theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
-        legend.position = "",
-        plot.subtitle = element_text(hjust = 1)) +
+        legend.position = "top",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -534,18 +531,17 @@ spr_r <- rough.spr %>%
   geom_line(aes(x = x, y = y), data = spr_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = spr_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = spr_line) +
-  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "", 
        y = "",
        x = "",
-       subtitle =  "(b) Spring") +
+       caption = "(b) Spring") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
-  theme(plot.title = element_text(hjust = 0.5),
+  theme(#plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
-        legend.position = "",
-        plot.subtitle = element_text(hjust = 1)) +
+        legend.position = "top",
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -576,18 +572,17 @@ sum_r <- rough.sum %>%
   geom_line(aes(x = x, y = y), data = sum_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = sum_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = sum_line) +
-  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "", 
        y = "",
        x = "",
-       subtitle = "(c) Summer") +
+       caption = "(c) Summer") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "",
-        plot.subtitle = element_text(hjust = 1)) +
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))
@@ -619,19 +614,17 @@ fall_r <- rough.fall %>%
   geom_line(aes(x = x, y = y), data = fall_line) +
   geom_line(aes(x = x, y = lwr), linetype = "dashed", data = fall_line) +
   geom_line(aes(x = x, y = upr), linetype = "dashed", data = fall_line) +
-  scale_color_manual(values = c("Mover" = "deeppink3", "Resident" = "cyan3")) +
   labs(col = "", fill = "", 
        y = "",
        x = "Availablilty",
-       subtitle = "(d) Fall") +
+       caption = "(d) Fall") +
   ggtitle("") +
   coord_cartesian(ylim = c(-10, 10),  xlim = c(-2, 2)) +
-  theme_classic() +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5),
         text = element_text(size = 15),
         legend.position = "",
-        plot.subtitle = element_text(hjust = 1)) +
+        plot.caption.position = "plot") +
   # theme(plot.title = element_text(hjust = 0.5)) +
   guides(size = guide_legend(order = 2), 
          col = guide_legend(order = 1))

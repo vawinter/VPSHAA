@@ -210,13 +210,10 @@ data_new %>%
   theme_bw() +
   scale_y_discrete(limits = rev(unique(conf_df$model)),
                    labels = rev(unique(conf_df$model))) +
-  theme(text = element_text(size = 15, color = "black"),
-        axis.text.x = element_text(size = 13, color = "black"),
-        axis.text.y = element_text(size = 15, color = "black"),
-        legend.text = element_text(size = 15, color = "black", angle = -90,
-                                   margin = margin(t = 10)),
-        legend.position = 'top', 
-        legend.spacing.x = unit(1.0, 'cm')) 
+  theme(text = element_text(size = 12, color = "black"),
+        axis.text.x = element_text(size = 11, color = "black", angle = -90),
+        axis.text.y = element_text(size = 12, color = "black"),
+        legend.text = element_text(size = 12, color = "black")) 
 
-ggsave("Figures_and_Results/TWS/model-dist_large.png", width = 8, height = 9, units = "in")
+ggsave("Figures_and_Results/TWS/model-dist_v3.png", width = 8, height = 6, units = "in")
 

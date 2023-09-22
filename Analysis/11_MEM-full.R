@@ -63,7 +63,7 @@ summary(Elev.mod.null <- lmer(Elev_beta ~ 1 +
                                 (1 | ID),
                               weights = weight_Elev, data = dat, REML = T))
 
-#summary(Elev.mod.null <- lm(dat$Elev_beta ~ 1))
+summary(Elev.mod.null <- lm(dat$Elev_beta ~ 1))
 r.squaredGLMM(Elev.mod.full)
 r.squaredGLMM(Elev.mod.null)
 

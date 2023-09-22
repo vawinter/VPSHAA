@@ -23,16 +23,7 @@
 rm(list = ls())
 gc()
 
-# install.packages("amt", 
-#                  repos='http://cran.us.r-project.org', 
-#                  lib='/storage/home/vaw5154/.R')
-
-install.packages("amt", repos = "https://cloud.r-project.org/", 
-                  lib = "/storage/home/work/.R")
-
 # Load packages ----
-library(amt, 
-        lib.loc="/storage/work/vaw5154/.R")
 library(tidyverse)
 library(lubridate)
 library(amt)

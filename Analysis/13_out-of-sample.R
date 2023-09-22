@@ -110,8 +110,6 @@ pred_dat$Elev.mod.prediction.full.m.scl <- scale(pred_dat$Elev.mod.prediction.fu
 
 pred_dat$Rough.mod.prediction.full.m <- predict(Rough.mod.full, newdata = pred_dat, re.form = NA)
 pred_dat$Rough.mod.prediction.null.m <- predict(Rough.mod.null, newdata = pred_dat, re.form = NA)
-pred_dat$Rough.mod.prediction.seas.m <- predict(Rough.mod.seas, newdata = pred_dat, re.form = NA)
-pred_dat$Rough.mod.prediction.avail.m <- predict(Rough.mod.avail, newdata = pred_dat, re.form = NA)
 
 temp <- 1 / (pred_dat$Rough_stder ^ 2)
 observed.weights <- temp / sum(temp, na.rm = TRUE)
@@ -136,19 +134,6 @@ abline(0,1, col = "red")
 tiff("Figures_and_Results/Manuscript/Rough.tif")
 dev.off()
 
-
-cor.seas <- weightedCorr(pred_dat$Rough_beta,
-                         pred_dat$Rough.mod.prediction.seas.m,
-                         method = "Pearson",
-                         weights = observed.weights)
-
-cor.avail <- weightedCorr(pred_dat$Rough_beta,
-                          pred_dat$Rough.mod.prediction.avail.m,
-                          method = "Pearson",
-                          weights = observed.weights)
-
-(cor.full - cor.seas) / 2
-(cor.full - cor.avail) / 2
 # Herbaceous
 pred_dat$Rough.mod.prediction.full.m.scl <- scale(pred_dat$Rough.mod.prediction.full.m)
 
