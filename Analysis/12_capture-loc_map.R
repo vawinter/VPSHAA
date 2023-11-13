@@ -17,6 +17,8 @@ library(lubridate)
 library(stringr)
 library(sf)
 library(raster)
+library(RSQLite)
+library(ggplot2)
 library(DBI)
 library(cowplot)
 library("rnaturalearth")
@@ -34,7 +36,7 @@ data("us_states", package = "spData")
 #capture <- read.csv("../../Data/PH_data/db_data/20220525_capture.csv", header = T)
 #a. Query the db 
 ph_db <- dbConnect(drv = RSQLite::SQLite(), # wherever I saved db
-                   "../../Data/PH_data/pronghorn.db")
+                   "../eHSF/Data/Processed/pronghorn.db")
 
 #b. Pull tables
 prong <- dbGetQuery(ph_db, "SELECT * FROM pronghorn;")
@@ -52,19 +54,20 @@ capture <- prong %>%
   group_by(ID) %>% 
   filter(row_number()==1) %>% 
   mutate(year = year(dt)) %>% 
-  filter(year == "2021")
+  filter(year == "2021",
+         month(dt) == 07)
 
 # Plot ----
 ## Base Map ----
 # Load in US
-us_states = st_transform(us_states, crs = 2163)
+#us_states = st_transform(us_states, crs = 2163)
 
 # Load in shape of utah
-dir <- "../../Analysis/VAW Study map/base"
+dir <- "geo"
 utah <- st_read(dsn = dir,
                 layer = "utah") %>% 
   st_transform(crs = st_crs(utm)) 
-plot(utah)
+#plot(utah)
 crs(utah)
 ext <- extent(utah)
 
@@ -82,17 +85,14 @@ ut_rast <- raster(crs = crs(utah),
 lake <- st_read(dsn = dir, 
                 layer = "salt_lake") %>% 
   st_transform(crs = st_crs(utm))
-plot(lake)
+# plot(lake)
 
-
-# I also created a hillshade raster that makes a relief map and makes it look nice
-#   (the raster resolution from the DEM I derived this from was really high
-#   so I aggregated it by a factor of 10 to cut down unnecessary processing)
-hill_low_res <- raster("../../Analysis/VAW Study map/base/hill_low_res.tif")
-
+# Load in raster
+hill_low_res <- raster("../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/DEM/dem_utm.tif")
+names(hill_low_res) <- "fill"
 # Then mask/clip it to study area
 hill_clip <- raster::mask(hill_low_res, as_Spatial(utah)) 
-plot(hill_clip)
+#plot(hill_clip)
 
 # Make the hillshade raster into a dataframe so ggplot can handle it
 hill_df <- as.data.frame(hill_low_res, xy = TRUE)
@@ -103,7 +103,7 @@ colnames(hill_df) # hill_low_res
 # Make 10x10 km grid ----
 grid  <-  stars::st_as_stars(st_bbox(utah), dx = 10000, dy = 10000)
 grid <-  st_as_sf(grid)
-plot(grid)
+#plot(grid)
 
 # Make the hillshade raster into a dataframe so ggplot can handle it
 grid_df <- as.data.frame(grid, xy = TRUE)
@@ -111,7 +111,7 @@ grid_df <- as.data.frame(grid, xy = TRUE)
 # make the basemap into an object
 base <- ggplot() +
   geom_raster(data = hill_df, 
-              mapping = aes(x = x, y = y, fill = hill_low_res)) + 
+              mapping = aes(x = x, y = y, fill = fill)) + 
   # change the hillshade color gradient to grey
   scale_fill_gradient(low = "snow", high = "gray40",
                       # make NA values (like the ones masked out) transparent
@@ -123,16 +123,17 @@ base <- ggplot() +
   ylim(c(new_ext@ymin, new_ext@ymax)) +
   theme(panel.background = element_rect(fill = NA, colour = "black")) +
   # this is so the axes coordinates are in UTM system and not latlon
-  coord_sf(datum = st_crs(utm)) 
+  # coord_sf(datum = st_crs(utm)) 
+  coord_sf() 
 
 # add grid to map
 grid_map <- base +
   geom_sf(data = grid, fill = NA, color = alpha("gray46", 0.2)) +
   #geom_sf(data = grid, fill = NA, color = NA) +
   theme(panel.background = element_rect(fill = NA, colour = "black", size = 1.2)) +
-  oord_sf(xlim = c(-4300000, 45), ylim = c(30, 73), expand = FALSE)
+  coord_sf(xlim = c(-4300000, 45), ylim = c(30, 73), expand = FALSE)
 # this is so the axes coordinates are in UTM system and not latlon
-coord_sf(datum = st_crs(utm))
+#coord_sf(datum = st_crs(utm))
 
 # add points per individual capture
 map1 <- grid_map +
@@ -140,15 +141,12 @@ map1 <- grid_map +
   geom_point(aes(capture$x, capture$y, col = as.factor(capture$year))) +
   # labels
   labs(col = "Year of Capture", fill = "", 
-       y = "UTM Y",
-       x = "UTM X") +
+       y = "",
+       x = "") +
   ggtitle("Pronghorn Capture Locations") +
   # adjust title
   theme(plot.title = element_text(hjust = 0.5))  +
   ggspatial::annotation_scale()
-  # theme(legend.position = c(0.4, 0.05),
-  #      legend.direction = "horizontal",
-  #      legend.key.width = unit(10, "mm"))
 
 # add points per individual capture
 map2 <- grid_map +
@@ -156,15 +154,11 @@ map2 <- grid_map +
   geom_point(aes(capture$x, capture$y, col = as.factor(capture$year))) +
   # labels
   labs(col = "Year of Capture", fill = "", 
-       y = "UTM Y",
-       x = "UTM X") +
- # ggtitle("Pronghorn Capture Locations") +
+       y = "",
+       x = "") +
   # adjust title
   theme(plot.title = element_text(hjust = 0.5))  +
   ggspatial::annotation_scale()
-# theme(legend.position = c(0.4, 0.05),
-#      legend.direction = "horizontal",
-#      legend.key.width = unit(10, "mm"))
 
 lake_inset <-  ggplot() +
   geom_sf(data = lake, fill = "skyblue1") +

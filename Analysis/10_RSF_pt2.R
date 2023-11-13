@@ -23,7 +23,15 @@
 rm(list = ls())
 gc()
 
+# install.packages("amt", 
+#                  repos='http://cran.us.r-project.org', 
+#                  lib='/storage/home/vaw5154/.R')
+
+install.packages("amt", repos = "https://cloud.r-project.org/", 
+                  lib = "/storage/home/work/.R")
+
 # Load packages ----
+library(amt)
 library(tidyverse)
 library(lubridate)
 library(amt)
@@ -38,7 +46,7 @@ source("Analysis/99_funs.R")
 ## Load data ---- # new edit 2/10/2022
 ### Load in landscape covariates ----
 #dir <- "../Covar_org/"
-dir <- "../../../../Box/Projects/buffer/Covar_org/"
+dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/Projects/buffer/Covar_org/"
 
 # List covariate files
 landscapes <- list.files(dir, full.names = T)[!list.files(dir) %in% c("landscape_201801.tif",
