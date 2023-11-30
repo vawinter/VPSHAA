@@ -1,5 +1,5 @@
 # eHSF
-Habitat selection analysis for MSc chapter 1
+Habitat selection analysis for Winter et al. in review
 
 
 File structure:
