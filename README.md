@@ -1,5 +1,5 @@
-# eHSF
-Habitat selection analysis for MSc chapter 1
+# VPSHAA: Data prep, analysis, prediction, and validation 
+Habitat selection analysis for Winter et al. in review
 
 
 File structure:
