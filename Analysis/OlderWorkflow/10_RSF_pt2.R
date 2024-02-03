@@ -46,25 +46,25 @@ source("Analysis/99_funs.R")
 ## Load data ---- # new edit 2/10/2022
 ### Load in landscape covariates ----
 #dir <- "../Covar_org/"
-dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/Projects/buffer/Covar_org/"
+dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/30X30_covariates/"
 
 # List covariate files
 landscapes <- list.files(dir, full.names = T)[!list.files(dir) %in% c("landscape_201801.tif",
                                                        "landscape_201901.tif",
                                                        "landscape_202001.tif",
-                                                       "202102_model_data.rds",
-                                                       "202104_model_data.rds",
-                                                       "202107_model_data.rds",
-                                                       "202111_model_data.rds",
+                                                       # "202102_model_data.rds",
+                                                       # "202104_model_data.rds",
+                                                       # "202107_model_data.rds",
+                                                       # "202111_model_data.rds",
                                                        "2021_covar")]
 
 
 # Input into data frame
 dates <- data.frame(filename = landscapes,
                     # find year in name
-                    year = substr(stringr::word(landscapes, 3, 3, "_"), start = 1, stop = 4),
+                    year = substr(stringr::word(landscapes, 5, 5, "_"), start = 1, stop = 4),
                     # find month in name
-                    month = substr(stringr::word(landscapes, 3, 3, "_"), start = 5, stop = 6)) %>% 
+                    month = substr(stringr::word(landscapes, 5, 5, "_"), start = 5, stop = 6)) %>% 
   # create leap column for leap year
   mutate(leap = case_when(year == 2020 ~ TRUE,
                           TRUE ~ FALSE),
@@ -99,7 +99,7 @@ for (l in landscapes) {
   
 
   # Load and str data ----
-  ph_dat <- readRDS("Data/Processed/20220813_cleaned-data.rds")
+  ph_dat <- readRDS("../eHSF/Data/Processed/20220813_cleaned-data.rds")
   
   
   # Filter desired date range
@@ -212,7 +212,7 @@ for (l in landscapes) {
   # BJS comment: I would end this script here. Save mod_dat as your "final"
   # model data, and fit RSFs in the next script
   ym <- stringr::word(stringr::word(l, 3, 3, "_"), 1, 1, "\\.")
-  saveRDS(mod_dat, paste0("Data/Processed/RSF_data/", ym, "_model_data.rds"))
+  saveRDS(mod_dat, paste0("../Chapter2/Data/", ym, "_model_data.rds"))
   
   # clean up env
   gc()

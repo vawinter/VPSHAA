@@ -21,7 +21,7 @@ gc()
 library(dplyr)
 
 # Load in data
-mod <-readRDS("Data/Processed/RSF_data/20230812_3rd-order_RSF-prep.rds")
+mod <-readRDS("Data/Processed/RSF_data/20231130_covaraite_avail.rds")
 #mod$SND[is.na(mod$SND)] <- 0
 mod$SND <- as.numeric(mod$SND)
 
@@ -81,7 +81,7 @@ for(y in years){
     
   for(i in 1:length(indiv)){
     # Store in list
-    print(paste(i, indiv[i]))
+   # print(paste(i, indiv[i]))
     # Subset individual data
     dat <- y %>% 
       filter(ID == indiv[i],

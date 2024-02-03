@@ -19,7 +19,7 @@ options(scipen = 999)
 # Load in data
 m_sd <- read.csv("Data/Processed/Mean_sd/20221019_mean-sd_all.csv", header = T)
 
-# Load in data
+# Load in data created using same workflow from 01_RSF-analysis-code
 pred_dat <- read.csv("Data/Outputs/2021_pred/20221024_2021-10.6.csv", header = T)
 pred_dat <- pred_dat[(pred_dat$used_in + pred_dat$used_out) > 70,]
 

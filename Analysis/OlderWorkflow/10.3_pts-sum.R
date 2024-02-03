@@ -28,10 +28,10 @@ library(sf)
 library(lubridate)
 
 # functions
-source("99_funs.R")
+source("Analysis/99_funs.R")
 
 ### Load in landscape covariates ----
-dir <- "../../../../Box/Projects/buffer/Covar_org/"
+dir <- "../../../../Box/Projects/buffer/Covar_org/2021_covar"
 
 
 # Create empty data frame to store results
@@ -48,14 +48,13 @@ landscapes <- list.files(dir, full.names = T)[!list.files(dir) %in% c("landscape
                                                                       "202102_model_data.rds",
                                                                       "202104_model_data.rds",
                                                                       "202107_model_data.rds",
-                                                                      "202111_model_data.rds",
-                                                                      "2021_covar")]
+                                                                      "202111_model_data.rds")]
 # Input into data frame
 dates <- data.frame(filename = landscapes,
                     # find year in name
-                    year = substr(stringr::word(landscapes, 3, 3, "_"), start = 1, stop = 4),
+                    year = substr(stringr::word(landscapes, 4, 4, "_"), start = 1, stop = 4),
                     # find month in name
-                    month = substr(stringr::word(landscapes, 3, 3, "_"), start = 5, stop = 6)) %>% 
+                    month = substr(stringr::word(landscapes, 4, 4, "_"), start = 5, stop = 6)) %>% 
   # create leap column for leap year
   mutate(leap = case_when(year == 2020 ~ TRUE,
                           TRUE ~ FALSE),
@@ -159,18 +158,19 @@ for (l in landscapes) {
 }
 
 # Remove first row of NAs
-output <- output[-1, ]
+output <- na.omit(output)
 
 # Check that all months/years are accounted for
 table(output$month)
 table(output$year)
 
 # Save as .csv
-outdir <- "../RSF_data/final_outputs/"
+#outdir <- "../RSF_data/final_outputs/"
+outdir <- "../Chapter2/Data/from_CH1/"
 if(!dir.exists(outdir)){dir.create(outdir)}
 dir.exists(outdir)
 
-write.csv(output, paste0(outdir, "20220714_2021_used.csv"), row.names = FALSE)
+write.csv(output, paste0(outdir, "20231206_used.csv"), row.names = FALSE)
 
 # DONE!
 
