@@ -1,4 +1,4 @@
-# VPSHAA: eHSF analysis 
+# VPSHAA: Data prep, analysis, prediction, and validation 
 Habitat selection analysis for Winter et al. in review
 
 
