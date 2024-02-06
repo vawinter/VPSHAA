@@ -96,7 +96,7 @@ mig_tab <- data.frame("Year" = c("2018", "2018", "2019", "2019", "2020","2020",
                format = "latex",
                align = c("lrccccccccc")) %>% 
  # column_spec(2,bold=T,latex_column_spec = ">{\\\\color{black}}c") %>% 
- # collapse_rows(columns = 2, latex_hline = "major",valign = "middle") %>%
+  collapse_rows(columns = 1, latex_hline = "major",valign = "middle") %>%
   kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = FALSE)
 
 writeClipboard(mig_tab)
@@ -268,3 +268,68 @@ and a negative value demonstrates a negative association of prediction.",
 
 writeClipboard(table6)
 
+
+#### Appendix B table: GPS locations outside availability domain
+# Load in data
+dat <- read.csv( "Data/Outputs/RSF_outputs/20221018-10.6.csv",
+                 header = T, na.strings = c("", "N/A", "NA"))
+
+# Summarize the data for each threshold
+summary_20 <- dat %>%
+  filter((used_in + used_out) < 70) %>%
+  group_by(month, year, is.mig, is.res, is.unk_mig) %>%
+  summarize(count_20 = n(), .groups = "drop")
+
+summary_10 <- dat %>%
+  filter((used_in + used_out) < 35) %>%
+  group_by(month, year, is.mig, is.res, is.unk_mig) %>%
+  summarize(count_10 = n(), .groups = "drop")
+
+summary_5 <- dat %>%
+  filter((used_in + used_out) < 18) %>%
+  group_by(month, year, is.mig, is.res, is.unk_mig) %>%
+  summarize(count_5 = n(), .groups = "drop")
+
+# Perform a full join to ensure all month/year combinations are present
+combined_summary <- full_join(summary_20, summary_10, 
+                              by = c("month", "year", "is.mig", "is.res", "is.unk_mig"))
+combined_summary <- full_join(combined_summary, summary_5, 
+                              by = c("month", "year", "is.mig", "is.res", "is.unk_mig"))
+
+# Replace NA with 0 for counts
+combined_summary[is.na(combined_summary)] <- 0
+
+# Create a Season/Year column and a Migratory Status column
+combined_all <- combined_summary %>%
+  mutate(Migratory_Status = case_when(is.mig == 1 ~ "Range-shifter", 
+                                      is.res == 1 ~"Resident",
+                                      is.unk_mig == 1 ~ "Nomad",
+                                      TRUE ~ "Nomad"),
+         Season = case_when(month == '2' ~ "Winter",
+                            month == '4' ~ "Spring",
+                            month == '7' ~ "Summer",
+                            month == '11' ~ "Fall")) %>% 
+  dplyr::select(-c(is.mig, is.res, is.unk_mig)) %>% 
+  distinct()
+
+# Select and rename the columns for the final table
+final_table <- combined_all %>%
+  dplyr::select(Season, year, Migratory_Status, count_20, count_10, count_5) %>%
+  rename('Year' = year, 'Movement Status' = Migratory_Status, '20%' = count_20, '10%' = count_10, '5%' = count_5) %>% 
+  relocate('Year', .before = 'Season')
+
+# order year in ascending order
+final_table <- final_table[order(final_table$Year), ]
+
+# Create the table
+extentpoints <- kable(final_table, 
+                      booktabs = T,
+                      escape = F,
+                      caption = "Number of individuals in each season and year with 20%, 10%, and 5% GPS location 
+      outside the 10x10km availability domain in each season.",
+                      format = "latex",
+                      align = c("lrccccccccc")) %>% 
+  collapse_rows(columns = 1, latex_hline = "major",valign = "middle") %>%
+  kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = FALSE)
+
+writeClipboard(extentpoints)

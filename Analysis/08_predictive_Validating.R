@@ -36,7 +36,7 @@ library(sf)
 
 # Step 1: Load data ----
 # Pronghorn GPS data
-ph_dat <- readRDS("20230914_ph-status_2021.rds")
+ph_dat <- readRDS("../Winter_etal_map/20230914_ph-status_2021.rds")
 
 # Load season sex status ----
 seas <-  "spring"
@@ -46,13 +46,13 @@ s.num <- 04
 sex_filt <- "F" # because sex in data is capitalized...
 
 # D3 data frame (Normalized data frame from 04_NormalizedMapping.R)
-d3 <- readRDS(paste0("out/ForBoyce_d3-",seas,"-", sex,"-", stat,".rds"))
+d3 <- readRDS(paste0("../Winter_etal_map/out/ForBoyce_d3-",seas,"-", sex,"-", stat,".rds"))
 # 3rd-order raster
-r3 <- rast(paste0("out/geo/",seas, "_", sex,"_",stat,"_3rd_norm.tif")) # use non-normalized maps
+r3 <- rast(paste0("../Winter_etal_map/out/geo/",seas, "_", sex,"_",stat,"_3rd_norm.tif")) # use non-normalized maps
 # 2nd-order raster
 r2 <- rast(paste0("../Winter_etal_map/out/2nd-order_map/", seas, "_2nd-order_map.tif"))
 # Combined order
-comb <- rast(paste0("out/geo/",seas, "_", sex,"_",stat,"_combined.tif"))
+comb <- rast(paste0("../Winter_etal_map/out/geo/",seas, "_", sex,"_",stat,"_combined.tif"))
 
 # Step 2 -- Pronghorn GPS ----
 # Organize GPS data
@@ -63,7 +63,8 @@ ph <- ph_dat %>%
                 y,
                 dt,
                 tendency,
-                sex) %>%
+                sex,
+                unit) %>%
   # format the other columns
   mutate(season = month(dt),
          x = as.numeric(x),
@@ -78,6 +79,7 @@ ph <- ph_dat %>%
          sex == sex_filt,
          # migratory status
          tendency == stat
+        # wmu == c()
          ) %>%
   # Now, grab data that I want
   dplyr::select(num_id, x, y) %>%

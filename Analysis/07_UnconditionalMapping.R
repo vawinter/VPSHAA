@@ -1,5 +1,22 @@
 # Created 9/12/2023
-# Trying to seperate out plotting for RAM
+
+# Step 1, combine 3rd- & 2nd-order maps
+# Scale 3rd order habitat selection so that each 10-km pixel sums to 1
+#   [i.e., Pr(3rd-order use | 2nd-order use)]
+# Scale 2nd order habitat selection so that entire raster sums to 1
+#   [i.e., Pr(2nd-order use)]
+# Combine by multiplying
+#   [i.e., Pr(3rd-order use | 2nd-order use) * Pr(2nd-order use)
+#                                                         = Pr(3rd-order use)]
+#
+# Step 2, subset to pronghorn GPS locations
+# Keep just those 10-km pixels with at least 1 pronghorn location
+#
+# Step 3, bin 30-m cells
+#   Sort by combined eHSF, break into ~ 30 bins w/ equal area
+#     (= equal # of raster cells)
+#   Count GPS locations (30 m)/individual (10 km) in each bin
+#   Calculate average eHSF in each bin
 
 rm(list = ls())
 gc()

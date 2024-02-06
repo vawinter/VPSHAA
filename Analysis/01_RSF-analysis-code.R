@@ -25,7 +25,7 @@ indiv <- prong %>%
 ph_dat <- prong %>% 
   dplyr::filter(ID %in% indiv$ID)
 
-#rm(prong)
+rm(prong)
 
 # covariates
 dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/30X30_covariates/"
@@ -236,48 +236,43 @@ months <- unique(RSF_dat$month)
 years <- unique(RSF_dat$year)
 
 # DF for output ----
-glm_df <- data.frame(ID = NA,
-                     # Fill with betas
-                     Intercept_beta = NA,
-                     Elev_beta = NA,
-                     Asp_sin_beta = NA,
-                     Asp_cos_beta = NA,
-                     Rough_beta = NA,
-                     Herb_beta = NA,
-                     Shrub_beta = NA,
-                     Tree_beta = NA,
-                     # Fill with st. errors
-                     Intercept_stder = NA,
-                     Elev_stder = NA,
-                     Asp_sin_stder = NA,
-                     Asp_cos_stder = NA,
-                     Rough_stder = NA,
-                     Herb_stder = NA,
-                     Shrub_stder = NA,
-                     Tree_stder = NA,
-                     # month and year of GLM
-                     month = NA,
-                     year = NA,
-                     # Available points
-                     avail_pts = NA,
-                     m_elev = NA,
-                     m_snd = NA,
-                     m_a.sin = NA,
-                     m_a.cos = NA,
-                     m_rough = NA,
-                     m_bio = NA,
-                     m_herb = NA,
-                     m_shrub = NA,
-                     m_tree = NA,
-                     m_road = NA,
-                     m_pdsi = NA,
-                     # m_SC_a.cos = NA,
-                     # m_SC_rough = NA,
-                     # m_SC_bio = NA,
-                     # m_SC_herb = NA,
-                     # m_SC_shrub = NA,
-                     # m_SC_tree = NA,
-                     row.names = NULL)
+glm_df <- NULL
+# glm_df <- data.frame(ID = NA,
+#                      # Fill with betas
+#                      Intercept_beta = NA,
+#                      Elev_beta = NA,
+#                      Asp_sin_beta = NA,
+#                      Asp_cos_beta = NA,
+#                      Rough_beta = NA,
+#                      Herb_beta = NA,
+#                      Shrub_beta = NA,
+#                      Tree_beta = NA,
+#                      # Fill with st. errors
+#                      Intercept_stder = NA,
+#                      Elev_stder = NA,
+#                      Asp_sin_stder = NA,
+#                      Asp_cos_stder = NA,
+#                      Rough_stder = NA,
+#                      Herb_stder = NA,
+#                      Shrub_stder = NA,
+#                      Tree_stder = NA,
+#                      # month and year of GLM
+#                      month = NA,
+#                      year = NA,
+#                      # Available points
+#                      avail_pts = NA,
+#                      m_elev = NA,
+#                      m_snd = NA,
+#                      m_a.sin = NA,
+#                      m_a.cos = NA,
+#                      m_rough = NA,
+#                      m_bio = NA,
+#                      m_herb = NA,
+#                      m_shrub = NA,
+#                      m_tree = NA,
+#                      m_road = NA,
+#                      m_pdsi = NA,
+#                      row.names = NULL)
 
 # forumla
 

@@ -3,6 +3,8 @@
 # "Forecasting Animal Distribution through Individual
 #  Habitat Selection: Insights for Population Inference and
 #  Transferable Predictions"
+
+
 rm(list = ls())
 gc()
 
@@ -114,7 +116,8 @@ names(mod_fin) <- c("log_SND", "log_Road","SND", "PDSI")
 
 write.csv(mod_fin, "Data/Mean-sd_snow-road.csv", row.names = F)
 
-# MEM model run
+# MEM model run ----
+# 2021 data is excluded from this analysis and done later on
 ## Elevation ----
 # ... Elevation ----
 summary(Elev.mod.full <- lmer(Elev_beta ~ 0 + Intercept_beta_scale + 
@@ -412,3 +415,5 @@ names(models) <- c("Elev.mod.full", "Rough.mod.full", "Herb.mod.full", "Shrub.mo
 
 
 saveRDS(models, "Data/MEM_data.rds")
+
+# Done! Now can plot in script 03 and/or move onto script 04 for predictive mapping
