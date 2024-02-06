@@ -9,7 +9,7 @@ Habitat selection analysis for Winter et al. in review
 -'03_' file is for plotting MEM outputs
 
 ### Spatial predictions and Mapping
--'04_", "_05", "06_" are predicting and mapping out of sample data and unconditional mapping
+-'04_", "_05", & "_06" are predicting and mapping out of sample data and unconditional mapping
 
 ### Validating
-"07_" and "08_" are validating the functional responses, spatial predictions, and unconditional mapping on the full, season, and null models 
+"07_" & "08_" are validating the functional responses, spatial predictions, and unconditional mapping on the full, season, and null models 
