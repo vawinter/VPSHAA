@@ -45,7 +45,7 @@ stat <-  "res"
 s.num <- 04
 sex_filt <- "F" # because sex in data is capitalized...
 
-# D3 data frame (Normalized data frame from 04_NormalizedMapping.R)
+# D3 data frame (Normalized data frame from 06_NormalizedMapping.R)
 d3 <- readRDS(paste0("../Winter_etal_map/out/ForBoyce_d3-",seas,"-", sex,"-", stat,".rds"))
 # 3rd-order raster
 r3 <- rast(paste0("../Winter_etal_map/out/geo/",seas, "_", sex,"_",stat,"_3rd_norm.tif")) # use non-normalized maps

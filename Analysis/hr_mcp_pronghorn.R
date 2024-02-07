@@ -97,7 +97,7 @@ prong <- dbGetQuery(ph_db, "SELECT * FROM pronghorn;")
 status <- dbGetQuery(ph_db, "SELECT * FROM status;") 
 
 # intersect the IDs to limit to only indiv in fin
-combo <-  intersect(result_df$ID, prong$ID)
+combo <-  intersect(results_df$ID, prong$ID)
 
 
 # edit ph table
@@ -108,35 +108,35 @@ ph <-  prong  %>%
   left_join(status, by = "ID") %>% 
   mutate(year = as.integer(year))
 
-# Create a 'summer' and 'winter' movement class
-fin <- result_df %>%
-  mutate(
-    mig_season = case_when(
-      month %in% c(04, 07) ~ "S",
-      month %in% c(02, 11) ~ "W",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  # join data frame with behvaiors
-  left_join(ph, by = c("ID", "year", "mig_season")) %>% 
-  mutate(movement = case_when(
-    tendency == "mig" ~ 'Range-shifter',
-    tendency == "res" ~ 'Resident',
-    tendency == 'unk' ~ 'Nomad',
-    TRUE ~ 'Range-shifter'
-     )
-    )%>% 
-  group_by(month, year, movement) %>%
-  reframe(median_95_km = round(median(mcp_95_km[mcp_95_km > 0]), digits = 2),
-            range_95_km = range(mcp_95_km[mcp_95_km > 0])) %>%
-  filter(!year == 2021,
-         !is.na(median_95_km)) %>% 
-  rename('Year' = year, 'Season' = month, 'Movement Status' = movement, 
-         'Median 95% MCP' = median_95_km) %>% 
-  relocate('Year', .before = 'Season') 
+# # Create a 'summer' and 'winter' movement class
+# fin <- results_df %>%
+#   mutate(
+#     mig_season = case_when(
+#       month %in% c(04, 07) ~ "S",
+#       month %in% c(02, 11) ~ "W",
+#       TRUE ~ NA_character_
+#     )
+#   ) %>%
+#   # join data frame with behvaiors
+#   left_join(ph, by = c("ID", "year", "mig_season")) %>% 
+#   mutate(movement = case_when(
+#     tendency == "mig" ~ 'Range-shifter',
+#     tendency == "res" ~ 'Resident',
+#     tendency == 'unk' ~ 'Nomad',
+#     TRUE ~ 'Range-shifter'
+#      )
+#     )%>% 
+#   group_by(month, year, movement) %>%
+#   reframe(median_95_km = round(median(mcp_95_km[mcp_95_km > 0]), digits = 2),
+#             range_95_km = range(mcp_95_km[mcp_95_km > 0])) %>%
+#   filter(!year == 2021,
+#          !is.na(median_95_km)) %>% 
+#   rename('Year' = year, 'Season' = month, 'Movement Status' = movement, 
+#          'Median 95% MCP' = median_95_km) %>% 
+#   relocate('Year', .before = 'Season') 
 
 
-fin <- result_df %>%
+fin <- results_df %>%
   mutate(
     mig_season = case_when(
       month %in% c(04, 07) ~ "S",
@@ -171,7 +171,8 @@ fin <- result_df %>%
     'n' = count_n
   ) %>% 
   relocate('Year', .before = 'Season') %>% 
-  relocate('n', .before = 'Median 95% MCP')
+  relocate('n', .before = 'Median 95% MCP') %>% 
+  relocate('Minimum 95% MCP', .before = 'Median 95% MCP')
 
 
 # order year in ascending order

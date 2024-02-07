@@ -50,7 +50,7 @@ summary(Elev.mod.full <- lmer(Elev_beta ~ 0 + Intercept_beta_scale +
                                 I(is.Fall * scaled_PDSI) +
                                 (1 | unit:year) + (1 | ID),
                               data = dat, REML = T, weights = weight_Elev))
-summary(Elev.mod.null <- lmer(Elev_beta ~ 1 +
+summary(Elev.mod.seas <- lmer(Elev_beta ~ 1 +
                                 # Winter
                                 is.Winter +
                                 # Spring
@@ -63,10 +63,12 @@ summary(Elev.mod.null <- lmer(Elev_beta ~ 1 +
                                 (1 | ID),
                               weights = weight_Elev, data = dat, REML = T))
 
+summary(Elev.mod.null <- lm(dat$Elev_beta ~ 1))
+
 #summary(Elev.mod.null <- lm(dat$Elev_beta ~ 1))
 r.squaredGLMM(Elev.mod.full)
+r.squaredGLMM(Elev.mod.seas)
 r.squaredGLMM(Elev.mod.null)
-
 
 # ... Roughness ----
 #dat$Elev.mod.prediction.full.m.scl <- scale(predict(Elev.mod.full, re.form = NA)) 
@@ -95,7 +97,7 @@ summary(Rough.mod.full <- lmer(Rough_beta ~ 0 +
                                  I(is.Fall * scaled_PDSI) +
                                  (1 | unit:year) + (1 | ID),
                                weights = weight_Rough, data = dat, REML = T))
-summary(Rough.mod.null <- lmer(Rough_beta ~ 0 +
+summary(Rough.mod.seas <- lmer(Rough_beta ~ 0 +
                                  # Winter
                                  is.Winter + 
                                  # Spring
@@ -107,9 +109,10 @@ summary(Rough.mod.null <- lmer(Rough_beta ~ 0 +
                                  (1 | unit:year) + (1 | ID),
                                weights = weight_Rough, data = dat, REML = T))
 r.squaredGLMM(Rough.mod.full)
+r.squaredGLMM(Rough.mod.seas)
+
+summary(Rough.mod.null <- lm(dat$Rough_beta ~ 1))
 r.squaredGLMM(Rough.mod.null)
-
-
 # ... Herb ----
 #dat$Rough.mod.prediction.full.m.scl <- scale(predict(Rough.mod.full, re.form = NA)) 
 summary(Herb.mod.full <- lmer(Herb_beta ~ 0 +
@@ -138,7 +141,7 @@ summary(Herb.mod.full <- lmer(Herb_beta ~ 0 +
                                 I(is.Fall * scaled_PDSI) +
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Herb, data = dat, REML = T))
-summary(Herb.mod.null <- lmer(Herb_beta ~ 0 +
+summary(Herb.mod.seas <- lmer(Herb_beta ~ 0 +
                                 # Winter
                                 is.Winter + 
                                 # Spring
@@ -150,9 +153,10 @@ summary(Herb.mod.null <- lmer(Herb_beta ~ 0 +
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Herb, data = dat, REML = T))
 r.squaredGLMM(Herb.mod.full)
+r.squaredGLMM(Herb.mod.seas)
+
+summary(Herb.mod.null <- lm(dat$Herb_beta ~ 1))
 r.squaredGLMM(Herb.mod.null)
-
-
 # ... Shrub ----
 #dat$Herb.mod.prediction.full.m.scl <- scale(predict(Herb.mod.full, re.form = NA)) 
 summary(Shrub.mod.full <- lmer(Shrub_beta ~ 0 +
@@ -182,7 +186,7 @@ summary(Shrub.mod.full <- lmer(Shrub_beta ~ 0 +
                                  I(is.Fall * scaled_PDSI) +
                                  (1 | unit:year) + (1 | ID),
                                weights = weight_Shrub, data = dat, REML = T))
-summary(Shrub.mod.null <- lmer(Shrub_beta ~ 0 +
+summary(Shrub.mod.seas <- lmer(Shrub_beta ~ 0 +
                                  # Winter
                                  is.Winter + 
                                  # Spring
@@ -194,8 +198,10 @@ summary(Shrub.mod.null <- lmer(Shrub_beta ~ 0 +
                                  (1 | unit:year) + (1 | ID),
                                weights = weight_Shrub, data = dat, REML = T))
 r.squaredGLMM(Shrub.mod.full)
-r.squaredGLMM(Shrub.mod.null)
+r.squaredGLMM(Shrub.mod.seas)
 
+summary(Shrub.mod.null <- lm(dat$Shrub_beta ~ 1))
+r.squaredGLMM(Shrub.mod.null)
 # ... Tree ----
 #dat$Shrub.mod.prediction.full.m.scl <- scale(predict(Shrub.mod.full, re.form = NA)) 
 summary(Tree.mod.full <- lmer(Tree_beta ~ 0 +
@@ -225,7 +231,7 @@ summary(Tree.mod.full <- lmer(Tree_beta ~ 0 +
                                 I(is.Fall * is.res) + I(is.Fall * scaled_PDSI) +
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Tree, data = dat, REML = T))
-summary(Tree.mod.null <- lmer(Tree_beta ~ 0 +
+summary(Tree.mod.seas <- lmer(Tree_beta ~ 0 +
                                 # Winter
                                 is.Winter + 
                                 # Spring
@@ -237,6 +243,9 @@ summary(Tree.mod.null <- lmer(Tree_beta ~ 0 +
                                 (1 | unit:year) + (1 | ID),
                               weights = weight_Tree, data = dat, REML = T))
 r.squaredGLMM(Tree.mod.full)
+r.squaredGLMM(Tree.mod.seas)
+
+summary(Tree.mod.null <- lm(dat$Tree_beta ~ 1))
 r.squaredGLMM(Tree.mod.null)
 
 # ... ASP sin ----
@@ -270,7 +279,7 @@ summary(Asp_sin.mod.full <- lmer(Asp_sin_beta ~ 0 +
                                    I(is.Fall * scaled_PDSI) +
                                    (1 | unit:year) + (1 | ID),
                                  weights = weight_Asp_sin, data = dat, REML = T))
-summary(Asp_sin.mod.null <- lmer(Asp_sin_beta ~ 0 +
+summary(Asp_sin.mod.seas <- lmer(Asp_sin_beta ~ 0 +
                                    ## Winter
                                    is.Winter + 
                                    # Spring
@@ -282,8 +291,11 @@ summary(Asp_sin.mod.null <- lmer(Asp_sin_beta ~ 0 +
                                    (1 | unit:year) + (1 | ID),
                                  weights = weight_Asp_sin, data = dat, REML = T))
 r.squaredGLMM(Asp_sin.mod.full)
-r.squaredGLMM(Asp_sin.mod.null)
+r.squaredGLMM(Asp_sin.mod.seas)
 
+
+summary(Asp_sin.mod.null <- lm(dat$Asp_sin_beta ~ 1))
+r.squaredGLMM(Asp_sin.mod.null)
 
 # ... ASP cos ----
 #dat$Asp_sin.mod.prediction.full.m.scl <- scale(predict(Asp_sin.mod.full, re.form = NA)) 
@@ -317,7 +329,7 @@ summary(Asp_cos.mod.full <- lmer(Asp_cos_beta ~ 0 +
                                    I(is.Fall * scaled_PDSI) +
                                    (1 | unit:year) + (1 | ID),
                                  weights = weight_Asp_cos, data = dat, REML = T))
-summary(Asp_cos.mod.null <- lmer(Asp_cos_beta ~ 0 +
+summary(Asp_cos.mod.seas <- lmer(Asp_cos_beta ~ 0 +
                                    # Winter
                                    is.Winter + 
                                    # Spring
@@ -329,8 +341,10 @@ summary(Asp_cos.mod.null <- lmer(Asp_cos_beta ~ 0 +
                                    (1 | unit:year) + (1 | ID),
                                  weights = weight_Asp_cos, data = dat, REML = T))
 r.squaredGLMM(Asp_cos.mod.full)
-r.squaredGLMM(Asp_cos.mod.null)
+r.squaredGLMM(Asp_cos.mod.seas)
 
+summary(Asp_cos.mod.null <- lm(dat$Asp_cos_beta ~ 1))
+r.squaredGLMM(Asp_cos.mod.null)
 
 # Save outputs
 # Save model outputs ----
