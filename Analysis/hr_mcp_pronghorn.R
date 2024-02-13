@@ -90,7 +90,7 @@ for (i in 1:length(ph_ID)) {
 
 #a. Query the db 
 ph_db <- dbConnect(drv = RSQLite::SQLite(), # wherever I saved db
-                   "Data/Processed/pronghorn.db")
+                   "../eHSF/Data/Processed/pronghorn.db")
 
 #b. Pull tables
 prong <- dbGetQuery(ph_db, "SELECT * FROM pronghorn;")
@@ -150,9 +150,13 @@ fin <- results_df %>%
     tendency == "mig" ~ 'Range-shifter',
     tendency == "res" ~ 'Resident',
     tendency == 'unk' ~ 'Nomad',
-    TRUE ~ 'Range-shifter'
-  ))%>% 
-  group_by(month, year, movement) %>%
+    TRUE ~ 'Range-shifter'),
+    Season = case_when(month == '2' ~ "Winter",
+                       month == '4' ~ "Spring",
+                       month == '7' ~ "Summer",
+                       month == '11' ~ "Fall") 
+  )%>% 
+  group_by(Season, year, movement) %>%
   reframe(
     median_95_km = round(ifelse(length(mcp_95_km[mcp_95_km > 0]) > 0, median(mcp_95_km[mcp_95_km > 0]), NA), digits = 2),
     range_95_km = round(ifelse(length(mcp_95_km[mcp_95_km > 0]) > 0, range(mcp_95_km[mcp_95_km > 0]), NA), digits = 2),
@@ -164,7 +168,7 @@ fin <- results_df %>%
   ) %>% 
   rename(
     'Year' = year,
-    'Season' = month,
+    'Season' = Season,
     'Movement Status' = movement,
     'Median 95% MCP' = median_95_km,
     'Minimum 95% MCP' = range_95_km,
@@ -176,14 +180,18 @@ fin <- results_df %>%
 
 
 # order year in ascending order
+
+# Now, your data will be ordered as Winter, Spring, Summer, Fall
+
 final_table <- fin[order(fin$Year), ]
+#final_table <- fin[order(fin$Season), ]
 
 # Create the table
 hr <- kable(final_table, 
                       booktabs = T,
                       escape = F,
                       caption = "Median and minimum 95% MCP for each season and year per movement class.",
-                      format = "latex",
+                      format = "html",
                       align = c("lrccccccccc")) %>% 
   collapse_rows(columns = c(1,2), latex_hline = "major",valign = "middle") %>%
   kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = FALSE)

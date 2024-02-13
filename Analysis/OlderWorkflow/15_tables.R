@@ -271,7 +271,7 @@ writeClipboard(table6)
 
 #### Appendix B table: GPS locations outside availability domain
 # Load in data
-dat <- read.csv( "Data/Outputs/RSF_outputs/20221018-10.6.csv",
+dat <- read.csv( "../eHSF/Data/Outputs/RSF_outputs/20221018-10.6.csv",
                  header = T, na.strings = c("", "N/A", "NA"))
 
 # Summarize the data for each threshold
