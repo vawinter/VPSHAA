@@ -114,7 +114,7 @@ mod_fin <- data.frame(t(models_means))
 names(mod_fin) <- c("log_SND", "log_Road","SND", "PDSI")
 
 # save model outputs for predicting
-write.csv(mod_fin, "Data/Mean-sd_snow-road.csv", row.names = F)
+saveRDS(mod_fin, "Data/Mean-sd_snow-road.rds")
 
 # MEM model run ----
 # 2021 data is excluded from this analysis and done later on
