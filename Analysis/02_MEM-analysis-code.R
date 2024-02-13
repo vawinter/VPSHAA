@@ -10,7 +10,7 @@ gc()
 
 source("Analysis/xx_funs.R")
 
-# Load data
+# Load in data
 dat <- readRDS("Data/RSF_data.rds")
 
 ## Change class = integer to factor
@@ -102,8 +102,7 @@ log_Road_sd <- sd(log(dat$m_road_no_0), na.rm = T)
 dat$scaled_log_Road <- ((log(dat$m_road_no_0) - log_Road_m)/ log_Road_sd)
 
 # Save output ----
-write.csv(dat, "Data/Mem-prep.csv",
-          row.names = FALSE)
+saveRDS(dat, "Data/Mem-prep.rds")
 
 # Create data frame
 models_means <- data.frame(mean = c(log_SND_m, log_Road_m, SND_m, p_m),
@@ -114,6 +113,7 @@ models_means <- data.frame(mean = c(log_SND_m, log_Road_m, SND_m, p_m),
 mod_fin <- data.frame(t(models_means))
 names(mod_fin) <- c("log_SND", "log_Road","SND", "PDSI")
 
+# save model outputs for predicting
 write.csv(mod_fin, "Data/Mean-sd_snow-road.csv", row.names = F)
 
 # MEM model run ----

@@ -1,0 +1,248 @@
+# Cross validation 
+# Quantifying predictive capacity of these models
+
+
+# Need to scale and center based on scaling and centering done for 2018-2020 
+# data
+
+rm(list = ls())
+gc()
+
+# Libraries
+library(tidyverse)
+library(wCorr)
+
+source("Analysis/OlderWorkflow/11_MEM-full.R")
+
+options(scipen = 1)
+
+# Load in data
+m_sd <- read.csv("Data/Processed/Mean_sd/20221019_mean-sd_all.csv", header = T)
+
+# Load in data created using same workflow from 01_RSF-analysis-code
+pred_dat <- read.csv("Data/Outputs/2021_pred/20221024_2021-10.6.csv", header = T)
+pred_dat <- pred_dat[(pred_dat$used_in + pred_dat$used_out) > 70,]
+
+# Scale and center
+# Set SND NA values to 0
+pred_dat$m_snd[is.na(pred_dat$m_snd)] <- 0
+
+## PDSI ----
+# a. find mean
+pdsi_m <- m_sd$PDSI[1]
+# b. find sd
+pdsi_s <- m_sd$PDSI[2]
+#c. subtract and divide
+pred_dat$scaled_PDSI <- ((pred_dat$m_PDSI - pdsi_m)/ pdsi_s)
+
+## road ----
+pred_dat$m_road_no_0 <- pred_dat$m_road
+pred_dat$m_road_no_0[pred_dat$m_road == 0] <- min(pred_dat$m_road[pred_dat$m_road > 0])
+# a. find mean
+road_m <- m_sd$log_Road[1]
+# b. find sd
+road_s <-m_sd$log_Road[2]
+#c. subtract and divide
+pred_dat$scaled_log_Road <- ((log(pred_dat$m_road_no_0) - road_m)/ road_s)
+
+## Intercept -----
+# need to multiply by SE for this 
+pred_dat$Intercept_beta_scale <- 0
+
+## SND ----
+pred_dat$m_snd_no_0 <- pred_dat$m_snd
+pred_dat$m_snd_no_0[pred_dat$m_snd == 0] <- min(pred_dat$m_snd[pred_dat$m_snd > 0]) 
+# a. find mean
+SND_m <- m_sd$log_SND[1]
+# b. find sd
+SND_s <- m_sd$log_SND[2]
+#c. subtract and divide
+pred_dat$scaled_log_SND <- ((log(pred_dat$m_snd_no_0) - SND_m)/ SND_s)
+
+df <- NULL
+
+# Elevation
+pred_dat$Elev.mod.prediction.full.m <- predict(Elev.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Elev.mod.prediction.null.m <- predict(Elev.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Elev.mod.prediction.seas.m <- predict(Elev.mod.seas, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Elev_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Elev_beta,
+                         pred_dat$Elev.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+cor.null <- weightedCorr(pred_dat$Elev_beta,
+                         pred_dat$Elev.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+
+
+cor.seas <- weightedCorr(pred_dat$Elev_beta,
+                         pred_dat$Elev.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+
+(cor.full - cor.seas) / 2
+
+# Roughness
+pred_dat$Rough.mod.prediction.full.m <- predict(Rough.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Rough.mod.prediction.null.m <- predict(Rough.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Rough.mod.prediction.seas.m <- predict(Rough.mod.seas, newdata = pred_dat, re.form = NA)
+#pred_dat$Rough.mod.prediction.avail.m <- predict(Rough.mod.avail, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Rough_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Rough_beta,
+                         pred_dat$Rough.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Rough_beta,
+                         pred_dat$Rough.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+
+cor.seas <- weightedCorr(pred_dat$Rough_beta,
+                         pred_dat$Rough.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+
+# Herbaceous
+pred_dat$Herb.mod.prediction.full.m <- predict(Herb.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Herb.mod.prediction.null.m <- predict(Herb.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Herb.mod.prediction.seas.m <- predict(Herb.mod.seas, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Herb_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Herb_beta,
+                         pred_dat$Herb.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Herb_beta,
+                         pred_dat$Herb.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+cor.seas <- weightedCorr(pred_dat$Herb_beta,
+                         pred_dat$Herb.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+
+# Shrub
+pred_dat$Shrub.mod.prediction.full.m <- predict(Shrub.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Shrub.mod.prediction.null.m <- predict(Shrub.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Shrub.mod.prediction.seas.m <- predict(Shrub.mod.seas, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Shrub_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Shrub_beta,
+                         pred_dat$Shrub.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Shrub_beta,
+                         pred_dat$Shrub.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+cor.seas <- weightedCorr(pred_dat$Shrub_beta,
+                         pred_dat$Shrub.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+
+
+# Tree
+pred_dat$Tree.mod.prediction.full.m <- predict(Tree.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Tree.mod.prediction.null.m <- predict(Tree.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Tree.mod.prediction.seas.m <- predict(Tree.mod.seas, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Tree_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Tree_beta,
+                         pred_dat$Tree.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Tree_beta,
+                         pred_dat$Tree.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+cor.seas <- weightedCorr(pred_dat$Tree_beta,
+                         pred_dat$Tree.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+
+
+# Aspect - sin
+pred_dat$Asp_sin.mod.prediction.full.m <- predict(Asp_sin.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Asp_sin.mod.prediction.null.m <- predict(Asp_sin.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Asp_sin.mod.prediction.seas.m <- predict(Asp_sin.mod.seas, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Asp_sin_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Asp_sin_beta,
+                         pred_dat$Asp_sin.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Asp_sin_beta,
+                         pred_dat$Asp_sin.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+cor.seas <- weightedCorr(pred_dat$Asp_sin_beta,
+                         pred_dat$Asp_sin.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+
+
+
+# Aspect - cos
+pred_dat$Asp_cos.mod.prediction.full.m <- predict(Asp_cos.mod.full, newdata = pred_dat, re.form = NA)
+pred_dat$Asp_cos.mod.prediction.null.m <- predict(Asp_cos.mod.null, newdata = pred_dat, re.form = NA)
+pred_dat$Asp_cos.mod.prediction.seas.m <- predict(Asp_cos.mod.seas, newdata = pred_dat, re.form = NA)
+
+temp <- 1 / (pred_dat$Asp_cos_stder ^ 2)
+observed.weights <- temp / sum(temp, na.rm = TRUE)
+
+cor.full <- weightedCorr(pred_dat$Asp_cos_beta,
+                         pred_dat$Asp_cos.mod.prediction.full.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+cor.null <- weightedCorr(pred_dat$Asp_cos_beta,
+                         pred_dat$Asp_cos.mod.prediction.null.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+(cor.full - cor.null) / 2
+
+cor.seas <- weightedCorr(pred_dat$Asp_cos_beta,
+                         pred_dat$Asp_cos.mod.prediction.seas.m,
+                         method = "Pearson",
+                         weights = observed.weights)
+
+(cor.full - cor.seas) / 2
+

@@ -4,6 +4,20 @@
 #  Habitat Selection: Insights for Population Inference and
 #  Transferable Predictions"
 
+# a note on data set up: due to this being a sensitive species, we are
+# unable to share the XY positions. For this stage of the set-up, data should
+# be formatted with unique individual IDs, XY, and date-time stamp, as shown here:
+
+# ID              x         y           datetime                  
+# PR17F0001   44xxxx.   42xxxxx.   2017-12-18 20:15:00     
+# PR17F0001   44xxxx.   42xxxxx.   2017-12-18 22:30:00      
+# PR17F0001   44xxxx.   42xxxxx.   2017-12-19 01:00:00                        
+# PR17F0001   44xxxx.   42xxxxx.   2017-12-19 03:15:00                
+# PR17F0001   44xxxx.   42xxxxx.   2017-12-19 05:30:00                  
+
+# This table can include any other information that may pertain to the question
+# at hand for your system/species.
+
 # Clean up R environment 
 rm(list = ls())
 gc()
@@ -13,25 +27,14 @@ set.seed(123)
 # Load packages and functions
 source("Analysis/xx_funs.R")
 
-# pronghorn data
+# Load in data
 prong <- readRDS("Data/Processed/20220813_cleaned-data.rds") 
 
-# sample a few individuals
-indiv <- prong %>% 
-  dplyr::select(ID) %>% 
-  distinct() %>% 
-  sample_n(size = 20)
-
-ph_dat <- prong %>% 
-  dplyr::filter(ID %in% indiv$ID)
-
-rm(prong)
-
-# covariates
+# Load in covaraites of interest, here we are using covaraites 
+# in Appendix S2: Table 6
 dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/30X30_covariates/"
 landscapes <- list.files(dir, full.names = TRUE)
 
-# Additional covaraites ----
 # Road data path
 roads <- "../../../../Box/Avgar Lab on WILD/UtahBarriers/Roads/roads_pa_proj.tif"
 
@@ -73,6 +76,7 @@ for (l in 1:length(landscapes)) {
   # load in corresponding drought
   attr <- raster::raster(daymet[l])
   
+  # Name layers: July doesn't have snow, so we ahve to label these differently
   if ("07" %in% substr(names(landscape), start = 15, stop = 16)) {
     names(landscape) <- c(
       "elevation", "asp_sin", "asp_cos", "roughness", "bio",
@@ -85,10 +89,10 @@ for (l in 1:length(landscapes)) {
     )
   }
   
-  # create an object of desired dates for filtering gps data
+  # Create an object of desired dates for filtering gps data
   date_row <- dates[dates$filename == landscapes[l], ]
   
-  # add pronghorn gps information
+  # Add pronghorn gps information
   ph <- ph_dat %>%
     dplyr::select(ID, dt, x, y) %>%
     filter(
@@ -97,7 +101,7 @@ for (l in 1:length(landscapes)) {
     ) %>%
     arrange(dt)
   
-  # Extent
+  # Extent around location mid-season
   # Get the mid point for each indiv in each 'season'
   indiv <- unique(ph$ID)
   ph$mid_x <- NA
@@ -120,14 +124,14 @@ for (l in 1:length(landscapes)) {
     ph3 <- rbind(dat, ph3)
   }
   
-  # Looping over indiv rasters
+  # Looping over individual rasters
   # 1. Create empty lists for storage
   clip <- list()
   locs <- list()
   indiv <- unique(ph3$ID)
   locs_in <- list()
   
-  # I want to create a raster of clipped covars available to each indiv
+  # I want to create a raster of clipped covariatess available to each individual
   #  within the extent to run RSF analysis 
   
   for (k in 1:length(indiv)) {
@@ -192,9 +196,10 @@ for (l in 1:length(landscapes)) {
 mod_dat2 <- do.call(rbind, processed_data_list)
 
 # Save
-saveRDS(mod_dat2, "Data/DataProcessing.rds")
 
-# Need a clean up
+# Done with our individual covaraite extraction! 
+# Now below, we can load in data from this analysis:
+
 rm(list = ls())
 gc()
 
@@ -202,9 +207,9 @@ gc()
 source("Analysis/xx_funs.R")
 
 # Preparing data for RSF
-mod_dat <- readRDS("Data/DataProcessing.rds")
+mod_dat <- mod_dat2
 
-# Scaling covaraites ----
+# Scaling covariates ----
 # Specify the columns to be scaled
 cols_to_scale <- c("elevation", "asp_sin", "asp_cos", "roughness",
                    "bio", "herb", "shrub", "tree", "snd")
@@ -219,14 +224,7 @@ head(RSF_dat)
 # Save output
 saveRDS(RSF_dat, "Data/RSF_prep.rds")
 
-# RSF ----
-# Need a clean up
-rm(list = ls())
-gc()
-
-# Load packages and functions
-source("Analysis/xx_funs.R")
-
+# RSF for each individual/season/year ----
 # Run RSF -----
 RSF_dat <- readRDS("Data/RSF_prep.rds")
 
@@ -237,46 +235,9 @@ years <- unique(RSF_dat$year)
 
 # DF for output ----
 glm_df <- NULL
-# glm_df <- data.frame(ID = NA,
-#                      # Fill with betas
-#                      Intercept_beta = NA,
-#                      Elev_beta = NA,
-#                      Asp_sin_beta = NA,
-#                      Asp_cos_beta = NA,
-#                      Rough_beta = NA,
-#                      Herb_beta = NA,
-#                      Shrub_beta = NA,
-#                      Tree_beta = NA,
-#                      # Fill with st. errors
-#                      Intercept_stder = NA,
-#                      Elev_stder = NA,
-#                      Asp_sin_stder = NA,
-#                      Asp_cos_stder = NA,
-#                      Rough_stder = NA,
-#                      Herb_stder = NA,
-#                      Shrub_stder = NA,
-#                      Tree_stder = NA,
-#                      # month and year of GLM
-#                      month = NA,
-#                      year = NA,
-#                      # Available points
-#                      avail_pts = NA,
-#                      m_elev = NA,
-#                      m_snd = NA,
-#                      m_a.sin = NA,
-#                      m_a.cos = NA,
-#                      m_rough = NA,
-#                      m_bio = NA,
-#                      m_herb = NA,
-#                      m_shrub = NA,
-#                      m_tree = NA,
-#                      m_road = NA,
-#                      m_pdsi = NA,
-#                      row.names = NULL)
 
-# forumla
-
-base <- case_ ~ scaled_elevation + scaled_roughness + scaled_herb + scaled_shrub + 
+# Model formula
+mod <- case_ ~ scaled_elevation + scaled_roughness + scaled_herb + scaled_shrub + 
   scaled_tree + scaled_asp_sin + scaled_asp_cos
 
 # Loop over years
@@ -306,7 +267,7 @@ for (y in years) {
       unq <- dat %>% 
         filter(ID == i)
       
-      mod <- glm(data = unq, formula = base, weights = w, family = binomial)
+      mod <- glm(data = unq, formula = mod, weights = w, family = binomial)
       
       # save outputs from model
       temp <- data.frame(ID = i,
@@ -339,7 +300,7 @@ for (y in years) {
                          m_shrub = mean(unq$shrub),
                          m_tree = mean(unq$tree),
                          m_road = mean(unq$m_road),
-                         m_pdsi = mean(unq$m_pdsi),
+                         m_pdsi = mean(unq$m_PDSI),
                          row.names = NULL)
       
       # Combine together df's
@@ -353,7 +314,7 @@ for (y in years) {
 glm_df <- glm_df %>% 
   relocate(month, year, .before = Intercept_beta) 
 
-# remove last row of NA's
+# If needed, remove last row of NA's
 last_row_index <- nrow(glm_df)
 glm_df <-  glm_df %>%
   slice(-last_row_index)
