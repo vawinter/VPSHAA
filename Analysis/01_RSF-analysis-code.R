@@ -31,7 +31,7 @@ source("Analysis/xx_funs.R")
 prong <- readRDS("Data/Processed/20220813_cleaned-data.rds") 
 
 # Load in covaraites of interest, here we are using covaraites 
-# in Appendix S2: Table 6
+# listed in Appendix S3: Table 6
 dir <- "../../../../Box/Avgar Lab on WILD/UtahEnvironmentalCovariates/VW_Stacked_Covariates/30X30_covariates/"
 landscapes <- list.files(dir, full.names = TRUE)
 
