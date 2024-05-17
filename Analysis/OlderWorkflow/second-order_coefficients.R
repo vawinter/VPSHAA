@@ -20,11 +20,11 @@ harm <- function(x, na.rm = FALSE) {
 
 # Data load in ----
 ## Load in ph data
-ph_dat <- readRDS("comb_dat_20220524.rds")
+ph_dat <- readRDS("Data/Processed/comb_dat_20220524.rds")
 
 # Directories ----
 # Get extent for cell of interest
-cell = readRDS("out/cells_good.rds")
+cell = readRDS("../Winter_etal_map/out/cells_good.rds")
 
 # ## Load in shape of utah
 # Utah
@@ -34,7 +34,7 @@ ut <- st_read("geo/utah.shp") %>%
   st_transform(32612)
 
 ## List covariate files ----
-dir2 <- "2021_stacks/"
+dir2 <- "../Winter_etal_map/2021_stacks/"
 landscapes <- list.files(dir2, full.names = T)
 
 # for proj
@@ -170,7 +170,7 @@ all_results <- all_results %>%
     TRUE ~ Covaraite  # If none of the cases match, keep the original value
   )) %>%
   dplyr::select(-Covaraite) %>%
-  relocate(Covariate, .before = "Beta")
+  relocate(Covariate, .before = "Beta") 
 
 # # Calculate summary statistics across all seasons
 # summary_across_seasons <- aggregate(cbind(Mean_beta, LowerCI, UpperCI) ~ Covaraite, data = all_results, FUN = function(x) c(Mean = mean(x), LowerCI = min(x), UpperCI = max(x)))
@@ -179,8 +179,37 @@ all_results <- all_results %>%
 # print(summary_across_seasons)
 all_results
 
+# # Combine the data frames into one
+# betas_ci <- bind_rows(elev, rough, herb, shrub, tree, asp_sin, asp_cos) %>%
+#   mutate(Status = if_else(is.res == 0, "Mover", "Resident"),
+#          Season = case_when(
+#            group == "is.Winter" ~ "Winter",
+#            group == "is.Spring" ~ "Spring",
+#            group == "is.Summer" ~ "Summer",
+#            TRUE ~ "Fall"
+#          ),
+#          Sex = if_else(is.Male == 1, "Male", "Female")) %>%
+#   dplyr::select(-c(x, group, is.Male, is.res)) %>%
+#   rename("Beta" = y, "Lower CI" = lwr, "Upper CI" = upr) %>%
+#   relocate(Covariate, Status, Season, .before = Beta) %>%
+#   dplyr::select(-Sex, Status) %>%
+#   group_by(Season, Covariate) %>%
+#   summarise(across(c(Beta, `Lower CI`, `Upper CI`), mean)) %>% 
+#   ungroup()
+
+betas_ci <- readRDS("Data/betas_third-order_summary_table8.rds") %>% 
+  rename(Beta2 = Beta,
+         LowerCI2 = 'Lower CI',
+         UpperCI2 = 'Upper CI') %>% 
+  mutate(Beta2 = round(Beta2, digits = 3),
+         LowerCI2 = round(LowerCI2, digits = 3),
+         UpperCI2 = round(UpperCI2, digits = 3))
+
+# Print the resulting data frame
+print(betas_ci)
+
 x2 <- all_results %>%
-  left_join(mean_results) %>% # mean results from 10_RSF_pt3.R
+  left_join(betas_ci) %>% # mean results from 10_RSF_pt3.R
   filter(!Covariate == '(Intercept)')
 
 
@@ -188,9 +217,10 @@ x2 <- all_results %>%
 extentpoints <- kable(x2,
                       booktabs = T,
                       escape = F,
-                      caption = "",
+                     # caption = "",
                       format = "latex",
-                      align = c("lrccccccccc")) %>%
+                      align = c("lrccccccccc"),
+                      caption = "Mean $\\beta$ and 95% confidence intervals (CI) from habitat selection analyses completed at second- and third-order scales across individuals (for third-order) and years per season") %>%
   collapse_rows(columns = 1, latex_hline = "major",valign = "middle") %>%
   add_header_above(c( "", "", "Second-order" = 3, "Third-order" = 3), line = T)  %>%
   kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = FALSE)
